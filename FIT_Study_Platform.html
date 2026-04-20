@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIT Study Platform — Prof. Raskolnikov · Columbia Law S26</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0a0f; --surface:#111118; --surface2:#1a1a24; --surface3:#22222f;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.12);
+  --text:#e8e8f0; --muted:#6b6b80; --accent:#c8a96e; --accent2:#8b6fd4; --accent3:#4fa8a8;
+  --danger:#d46060; --success:#60a860; --warn:#d49060;
+  --serif:'DM Serif Display',Georgia,serif; --sans:'Instrument Sans',system-ui,sans-serif; --mono:'DM Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;}
+.layout{display:flex;min-height:100vh;}
+.sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;}
+.sb-header{padding:24px 20px 18px;border-bottom:1px solid var(--border);}
+.sb-logo{font-family:var(--serif);font-size:19px;color:var(--accent);line-height:1.2;margin-bottom:4px;}
+.sb-sub{font-size:11px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;}
+.sb-nav{flex:1;padding:14px 12px;overflow-y:auto;}
+.nav-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:0 8px;margin:16px 0 5px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;font-size:13.5px;color:var(--muted);transition:all .15s;border:none;background:none;width:100%;text-align:left;font-family:var(--sans);}
+.nav-item:hover{background:var(--surface2);color:var(--text);}
+.nav-item.active{background:rgba(200,169,110,.12);color:var(--accent);}
+.nav-icon{font-size:14px;width:18px;text-align:center;}
+.sb-footer{padding:14px 18px;border-top:1px solid var(--border);}
+.countdown-box{background:rgba(200,169,110,.07);border:1px solid rgba(200,169,110,.2);border-radius:10px;padding:12px 14px;}
+.cd-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.cd-val{font-family:var(--mono);font-size:22px;color:var(--accent);font-weight:500;}
+.cd-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.main{margin-left:240px;flex:1;display:flex;flex-direction:column;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:15px 30px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:90;}
+.topbar-title{font-family:var(--serif);font-size:20px;}
+.tb-badge{font-size:11px;padding:4px 10px;border-radius:20px;background:rgba(200,169,110,.1);color:var(--accent);border:1px solid rgba(200,169,110,.25);font-weight:500;}
+.content{padding:28px 32px;max-width:880px;}
+.section{display:none;animation:fadeUp .3s ease;}
+.section.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.pg-title{font-family:var(--serif);font-size:26px;margin-bottom:6px;}
+.pg-desc{font-size:14px;color:var(--muted);margin-bottom:26px;line-height:1.6;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px;}
+.card-sm{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+/* STATS */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:14px;margin-bottom:24px;}
+.stat{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+.stat-val{font-family:var(--mono);font-size:26px;font-weight:500;color:var(--text);}
+.stat-sub{font-size:12px;color:var(--muted);margin-top:3px;}
+/* CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:22px;}
+.chip{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);transition:all .15s;}
+.chip:hover{color:var(--text);}
+.chip.active{background:rgba(200,169,110,.13);color:var(--accent);border-color:rgba(200,169,110,.35);}
+/* FLASHCARD */
+.fc-wrap{perspective:1200px;margin-bottom:18px;}
+.fc{width:100%;min-height:210px;position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,0,.2,1);cursor:pointer;}
+.fc.flipped{transform:rotateY(180deg);}
+.fc-face{position:absolute;width:100%;min-height:210px;backface-visibility:hidden;border-radius:16px;padding:28px 32px;display:flex;flex-direction:column;justify-content:center;border:1px solid var(--border2);}
+.fc-front{background:var(--surface);}
+.fc-back{background:linear-gradient(135deg,#1a1424 0%,#0f1a1a 100%);border-color:rgba(79,168,168,.3);transform:rotateY(180deg);}
+.fc-tag{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;}
+.fc-back .fc-tag{color:var(--accent3);}
+.fc-text{font-size:16px;line-height:1.65;color:var(--text);}
+.fc-back .fc-text{color:#b0e0e0;}
+.fc-hint{font-size:11px;color:var(--muted);margin-top:16px;font-style:italic;}
+.fc-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.fc-ctr{font-family:var(--mono);font-size:13px;color:var(--muted);}
+/* BUTTONS */
+.btn{padding:8px 18px;border-radius:8px;font-size:13px;font-family:var(--sans);font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text);transition:all .15s;}
+.btn:hover{background:var(--surface3);}
+.btn:disabled{opacity:.35;cursor:default;}
+.btn-gold{background:rgba(200,169,110,.13);border-color:rgba(200,169,110,.3);color:var(--accent);}
+.btn-gold:hover{background:rgba(200,169,110,.22);}
+.btn-purple{background:rgba(139,111,212,.12);border-color:rgba(139,111,212,.3);color:var(--accent2);}
+.btn-teal{background:rgba(79,168,168,.1);border-color:rgba(79,168,168,.25);color:var(--accent3);}
+.btn-success{background:rgba(96,168,96,.1);border-color:rgba(96,168,96,.3);color:var(--success);}
+.btn-danger{background:rgba(212,96,96,.1);border-color:rgba(212,96,96,.3);color:var(--danger);}
+/* MC */
+.mc-meta{font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:12px;}
+.mc-q{font-size:16px;line-height:1.65;color:var(--text);margin-bottom:18px;font-weight:500;}
+.mc-opts{display:flex;flex-direction:column;gap:7px;margin-bottom:16px;}
+.mc-opt{padding:13px 17px;border-radius:10px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);cursor:pointer;font-size:14px;line-height:1.5;text-align:left;transition:all .15s;width:100%;font-family:var(--sans);}
+.mc-opt:hover:not(:disabled){background:var(--surface3);border-color:rgba(255,255,255,.15);}
+.mc-opt.correct{background:rgba(96,168,96,.12);border-color:rgba(96,168,96,.4);color:#90d890;}
+.mc-opt.incorrect{background:rgba(212,96,96,.1);border-color:rgba(212,96,96,.35);color:#e09090;}
+.mc-opt.reveal{background:rgba(96,168,96,.07);border-color:rgba(96,168,96,.2);color:#70b870;}
+.feedback{border-radius:10px;padding:13px 16px;font-size:13.5px;line-height:1.6;display:none;margin-bottom:14px;}
+.feedback.show{display:block;}
+.feedback.ok{background:rgba(96,168,96,.08);border:1px solid rgba(96,168,96,.25);color:#90d890;}
+.feedback.bad{background:rgba(212,96,96,.08);border:1px solid rgba(212,96,96,.25);color:#e09090;}
+/* WORD PROBLEMS */
+.wp-q{font-size:15px;line-height:1.7;color:var(--text);margin-bottom:8px;}
+.wp-sub{font-size:13.5px;color:var(--muted);font-style:italic;margin-bottom:18px;line-height:1.6;}
+.wp-ta{width:100%;min-height:130px;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:13px 15px;font-size:14px;font-family:var(--sans);color:var(--text);resize:vertical;line-height:1.6;margin-bottom:10px;}
+.wp-ta:focus{outline:none;border-color:rgba(200,169,110,.4);}
+.ai-box{background:var(--surface2);border:1px solid rgba(139,111,212,.25);border-radius:10px;padding:16px;margin-top:14px;display:none;}
+.ai-box.show{display:block;}
+.ai-head{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent2);margin-bottom:8px;font-weight:500;}
+.ai-body{font-size:14px;line-height:1.75;color:var(--text);}
+.score{display:inline-block;padding:2px 9px;border-radius:20px;font-size:12px;font-weight:600;font-family:var(--mono);margin-left:8px;}
+.score-hi{background:rgba(96,168,96,.15);color:#90d890;border:1px solid rgba(96,168,96,.3);}
+.score-mid{background:rgba(200,169,110,.15);color:var(--accent);border:1px solid rgba(200,169,110,.3);}
+.score-lo{background:rgba(212,96,96,.12);color:#e09090;border:1px solid rgba(212,96,96,.3);}
+/* TIMED */
+.timer{font-family:var(--mono);font-size:52px;font-weight:500;color:var(--text);text-align:center;margin:18px 0;letter-spacing:.03em;}
+.timer.warn{color:var(--warn);}
+.timer.crit{color:var(--danger);}
+.q-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(50px,1fr));gap:7px;margin-bottom:18px;}
+.q-dot{aspect-ratio:1;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:12px;font-family:var(--mono);color:var(--muted);cursor:pointer;transition:all .15s;}
+.q-dot:hover{border-color:var(--border2);color:var(--text);}
+.q-dot.done{background:rgba(96,168,96,.12);border-color:rgba(96,168,96,.3);color:#90d890;}
+.q-dot.curr{border-color:var(--accent);color:var(--accent);}
+/* SOCRATIC CHAT */
+.chat-box{background:var(--surface2);border:1px solid var(--border);border-radius:14px;height:420px;display:flex;flex-direction:column;overflow:hidden;margin-bottom:14px;}
+.chat-msgs{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:12px;}
+.chat-msg{max-width:85%;padding:11px 15px;border-radius:12px;font-size:14px;line-height:1.65;animation:msgIn .25s ease;}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg-prof{background:var(--surface3);border:1px solid var(--border2);align-self:flex-start;border-bottom-left-radius:3px;}
+.msg-prof::before{content:'Prof. Raskolnikov';display:block;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);margin-bottom:5px;font-weight:500;}
+.msg-you{align-self:flex-end;background:rgba(200,169,110,.1);border:1px solid rgba(200,169,110,.2);border-bottom-right-radius:3px;}
+.chat-in-row{border-top:1px solid var(--border);padding:11px 14px;display:flex;gap:9px;align-items:flex-end;}
+.chat-in{flex:1;background:var(--surface3);border:1px solid var(--border2);border-radius:8px;padding:9px 13px;font-size:14px;font-family:var(--sans);color:var(--text);resize:none;min-height:38px;max-height:90px;line-height:1.5;}
+.chat-in:focus{outline:none;border-color:rgba(200,169,110,.35);}
+.chat-in::placeholder{color:var(--muted);}
+/* OUTLINE */
+.ot{margin-bottom:7px;border-radius:10px;overflow:hidden;border:1px solid var(--border);}
+.ot-toggle{width:100%;padding:13px 16px;background:var(--surface2);border:none;color:var(--text);font-family:var(--sans);font-size:14px;font-weight:500;text-align:left;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background .15s;}
+.ot-toggle:hover{background:var(--surface3);}
+.ot-arrow{font-size:12px;color:var(--muted);transition:transform .2s;}
+.ot-toggle.open .ot-arrow{transform:rotate(90deg);}
+.ot-body{display:none;background:var(--surface);padding:16px 20px;font-size:13.5px;line-height:1.85;color:var(--muted);border-top:1px solid var(--border);}
+.ot-body.open{display:block;}
+.ot-body strong{color:var(--text);font-weight:500;}
+.ot-body code{font-family:var(--mono);font-size:12px;background:var(--surface3);padding:1px 6px;border-radius:4px;color:var(--accent3);}
+.ot-body li{margin-left:16px;margin-bottom:3px;}
+/* PERFORMANCE */
+.pb-row{margin-bottom:11px;}
+.pb-lbl{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;}
+.pb-name{color:var(--text);}
+.pb-score{font-family:var(--mono);color:var(--muted);}
+.pb-track{height:5px;background:var(--surface3);border-radius:3px;overflow:hidden;}
+.pb-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1);}
+/* SPINNER */
+.spinner{width:15px;height:15px;border:2px solid rgba(200,169,110,.2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:2px;}
+.divider{height:1px;background:var(--border);margin:22px 0;}
+.row{display:flex;gap:10px;align-items:center;}
+.spacer{flex:1;}
+.tag{font-size:11px;padding:2px 9px;border-radius:20px;font-weight:500;}
+.tag-gold{background:rgba(200,169,110,.1);color:var(--accent);border:1px solid rgba(200,169,110,.2);}
+.tag-teal{background:rgba(79,168,168,.1);color:var(--accent3);border:1px solid rgba(79,168,168,.2);}
+.tag-purple{background:rgba(139,111,212,.1);color:var(--accent2);border:1px solid rgba(139,111,212,.2);}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo">FIT Study<br>Platform</div>
+    <div class="sb-sub">Raskolnikov · Columbia Law · S26</div>
+  </div>
+  <div class="sb-nav">
+    <div class="nav-label">Study</div>
+    <button class="nav-item active" onclick="go('dashboard',this)"><span class="nav-icon">◈</span>Dashboard</button>
+    <button class="nav-item" onclick="go('flashcards',this)"><span class="nav-icon">⧉</span>Flashcards</button>
+    <button class="nav-item" onclick="go('mc',this)"><span class="nav-icon">⊙</span>Multiple Choice</button>
+    <button class="nav-item" onclick="go('wordproblems',this)"><span class="nav-icon">✎</span>Word Problems</button>
+    <div class="nav-label">Practice</div>
+    <button class="nav-item" onclick="go('timed',this)"><span class="nav-icon">◷</span>Timed Exam</button>
+    <button class="nav-item" onclick="go('socratic',this)"><span class="nav-icon">❧</span>Socratic Mode</button>
+    <div class="nav-label">Reference</div>
+    <button class="nav-item" onclick="go('outline',this)"><span class="nav-icon">≡</span>Course Outline</button>
+    <button class="nav-item" onclick="go('performance',this)"><span class="nav-icon">▲</span>Performance</button>
+  </div>
+  <div class="sb-footer">
+    <div class="countdown-box">
+      <div class="cd-label">Exam countdown</div>
+      <div class="cd-val" id="cdval">—</div>
+      <div class="cd-sub">2.5 hrs · Open book · No internet</div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Dashboard</div>
+    <span class="tb-badge">FIT · S26</span>
+  </div>
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div id="sec-dashboard" class="section active">
+      <div class="pg-title">Good session, Ebie.</div>
+      <p class="pg-desc">Federal Income Tax · Prof. Raskolnikov · 19 assignments · Exam: 2.5 hrs, 2 word problems + 15 MC (last 4 weighted)</p>
+      <div class="stat-grid">
+        <div class="stat"><div class="stat-label">Topics</div><div class="stat-val">19</div><div class="stat-sub">Assignments covered</div></div>
+        <div class="stat"><div class="stat-label">Flashcards</div><div class="stat-val">50+</div><div class="stat-sub">Across all topics</div></div>
+        <div class="stat"><div class="stat-label">MC bank</div><div class="stat-val">30</div><div class="stat-sub">Practice questions</div></div>
+        <div class="stat"><div class="stat-label">Exam</div><div class="stat-val">2.5h</div><div class="stat-sub">Open book · no internet</div></div>
+      </div>
+      <div class="card">
+        <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;">Exam structure</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div class="card-sm">
+            <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Part 1 · 60 min</div>
+            <div style="font-size:14px;line-height:1.6;">2 word problems<br><span style="color:var(--muted);font-size:13px;">Policy + application. One-sentence answers citing IRC sections.</span></div>
+          </div>
+          <div class="card-sm">
+            <div style="font-size:11px;color:var(--accent3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Part 2 · 90 min</div>
+            <div style="font-size:14px;line-height:1.6;">15 multiple choice<br><span style="color:var(--muted);font-size:13px;">Last 4 weighted more. Substantive, not memory-based. Time to think.</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;">TA exam strategy (from recordings)</div>
+        <div style="font-size:14px;line-height:1.9;">
+          <p style="margin-bottom:9px;">📌 <strong>Only what Raskolnikov says in class is tested.</strong> If it's in the reading but not said in class → not on exam.</p>
+          <p style="margin-bottom:9px;">📌 <strong>Attack outline strategy:</strong> Run through code sections like a checklist. For in-kind benefits: §119 → check → §132 → check → conclusion.</p>
+          <p style="margin-bottom:9px;">📌 <strong>One-sentence answers.</strong> "This qualifies as X because Y — cite §Z." That is the level of detail he wants.</p>
+          <p>📌 <strong>Bring a basic 4-function calculator.</strong> No phones. ~$10.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FLASHCARDS -->
+    <div id="sec-flashcards" class="section">
+      <div class="pg-title">Flashcards</div>
+      <p class="pg-desc">Click card to flip. Use arrow buttons or keyboard ← → to navigate.</p>
+      <div class="chips" id="fc-chips"></div>
+      <div class="fc-wrap">
+        <div class="fc" id="fc" onclick="flipCard()">
+          <div class="fc-face fc-front">
+            <div class="fc-tag" id="fc-topic-tag">Topic</div>
+            <div class="fc-text" id="fc-q">Loading...</div>
+            <div class="fc-hint">Click to reveal answer</div>
+          </div>
+          <div class="fc-face fc-back">
+            <div class="fc-tag">Answer</div>
+            <div class="fc-text" id="fc-a">...</div>
+          </div>
+        </div>
+      </div>
+      <div class="fc-nav">
+        <button class="btn" id="fc-prev" onclick="fcNav(-1)">← Prev</button>
+        <span class="fc-ctr" id="fc-ctr">1 / 1</span>
+        <button class="btn" id="fc-next" onclick="fcNav(1)">Next →</button>
+      </div>
+    </div>
+
+    <!-- MULTIPLE CHOICE -->
+    <div id="sec-mc" class="section">
+      <div class="pg-title">Multiple Choice</div>
+      <p class="pg-desc">Modeled on Prof. Raskolnikov's style — substantive, not memory. Select topic or go all.</p>
+      <div class="chips" id="mc-chips"></div>
+      <div class="card" id="mc-card">
+        <div class="mc-meta" id="mc-meta">Question 1 of 30</div>
+        <div class="mc-q" id="mc-q">Loading question...</div>
+        <div class="mc-opts" id="mc-opts"></div>
+        <div class="feedback" id="mc-feedback"></div>
+        <div class="row">
+          <button class="btn btn-gold" id="mc-next" onclick="nextMC()" disabled>Next question →</button>
+          <span class="spacer"></span>
+          <span style="font-size:13px;color:var(--muted);" id="mc-score-display">Score: 0/0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- WORD PROBLEMS -->
+    <div id="sec-wordproblems" class="section">
+      <div class="pg-title">Word Problems</div>
+      <p class="pg-desc">AI-graded in Prof. Raskolnikov's style. One-sentence answers with IRC cites are best. Submit and get instant feedback.</p>
+      <div class="chips" id="wp-chips"></div>
+      <div class="card" id="wp-card">
+        <div class="mc-meta" id="wp-meta">Problem 1 of 12</div>
+        <div class="wp-q" id="wp-q">Loading...</div>
+        <div class="wp-sub" id="wp-sub"></div>
+        <textarea class="wp-ta" id="wp-ta" placeholder="Type your answer here. Cite relevant IRC sections (§61, §102, etc.)..."></textarea>
+        <div class="row">
+          <button class="btn btn-purple" onclick="submitWP()" id="wp-submit">Submit for grading</button>
+          <button class="btn" onclick="nextWP()" id="wp-next" style="display:none">Next →</button>
+          <span class="spacer"></span>
+          <span id="wp-loading" style="display:none"><span class="spinner"></span> <span style="font-size:13px;color:var(--muted);margin-left:6px;">Prof. Raskolnikov is reviewing...</span></span>
+        </div>
+        <div class="ai-box" id="wp-feedback">
+          <div class="ai-head">Feedback <span id="wp-score-badge"></span></div>
+          <div class="ai-body" id="wp-feedback-body"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIMED EXAM -->
+    <div id="sec-timed" class="section">
+      <div class="pg-title">Timed Exam</div>
+      <p class="pg-desc">Full simulation. 90 minutes, 15 MC questions. Last 4 weighted. Start when ready.</p>
+      <div id="timed-start-screen">
+        <div class="card" style="text-align:center;padding:40px;">
+          <div style="font-family:var(--serif);font-size:22px;margin-bottom:12px;">Ready to simulate?</div>
+          <div style="font-size:14px;color:var(--muted);margin-bottom:28px;line-height:1.7;">15 questions · 90 minutes · No looking things up<br>Replicate real exam conditions. Bring your outline.</div>
+          <button class="btn btn-gold" style="font-size:15px;padding:11px 30px;" onclick="startTimed()">Start timed exam</button>
+        </div>
+      </div>
+      <div id="timed-exam-screen" style="display:none">
+        <div class="card" style="text-align:center;padding:20px;">
+          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Time remaining</div>
+          <div class="timer" id="exam-timer">1:30:00</div>
+          <div class="q-grid" id="q-grid"></div>
+        </div>
+        <div class="card" id="timed-q-card">
+          <div class="mc-meta" id="timed-meta">Question 1 of 15</div>
+          <div class="mc-q" id="timed-q">...</div>
+          <div class="mc-opts" id="timed-opts"></div>
+          <div class="feedback" id="timed-feedback"></div>
+          <div class="row" style="margin-top:10px;">
+            <button class="btn btn-gold" id="timed-next" onclick="nextTimed()" disabled>Next →</button>
+            <span class="spacer"></span>
+            <button class="btn btn-danger" onclick="endTimed()">End exam</button>
+          </div>
+        </div>
+      </div>
+      <div id="timed-results-screen" style="display:none">
+        <div class="card" style="text-align:center;padding:36px;">
+          <div style="font-family:var(--serif);font-size:24px;margin-bottom:10px;">Exam complete</div>
+          <div class="timer" id="final-score" style="font-size:48px;">—</div>
+          <div style="font-size:14px;color:var(--muted);margin-bottom:24px;" id="final-detail">—</div>
+          <button class="btn btn-gold" onclick="resetTimed()">Try again</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOCRATIC -->
+    <div id="sec-socratic" class="section">
+      <div class="pg-title">Socratic Mode</div>
+      <p class="pg-desc">Prof. Raskolnikov puts you on the spot. He'll pose a hypothetical, you answer, he pushes back. Powered by AI.</p>
+      <div class="chips" id="soc-chips"></div>
+      <div class="chat-box">
+        <div class="chat-msgs" id="chat-msgs"></div>
+        <div class="chat-in-row">
+          <textarea class="chat-in" id="chat-in" placeholder="Type your answer..." rows="1" onkeydown="chatKey(event)"></textarea>
+          <button class="btn btn-gold" onclick="sendChat()" id="chat-send">Send</button>
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn" onclick="newSocratic()">New hypothetical</button>
+        <span class="spacer"></span>
+        <span id="chat-loading" style="display:none"><span class="spinner"></span> <span style="font-size:13px;color:var(--muted);margin-left:6px;">Thinking...</span></span>
+      </div>
+    </div>
+
+    <!-- OUTLINE -->
+    <div id="sec-outline" class="section">
+      <div class="pg-title">Course Outline</div>
+      <p class="pg-desc">All 19 assignments organized by topic. Click to expand. Built from your notes, outline, and class recordings.</p>
+      <div id="outline-content"></div>
+    </div>
+
+    <!-- PERFORMANCE -->
+    <div id="sec-performance" class="section">
+      <div class="pg-title">Performance</div>
+      <p class="pg-desc">Track your progress across topics. Updates as you practice.</p>
+      <div class="stat-grid">
+        <div class="stat"><div class="stat-label">MC correct</div><div class="stat-val" id="perf-mc-pct">—%</div><div class="stat-sub" id="perf-mc-sub">0 of 0</div></div>
+        <div class="stat"><div class="stat-label">Cards reviewed</div><div class="stat-val" id="perf-fc">0</div><div class="stat-sub">Flashcards seen</div></div>
+        <div class="stat"><div class="stat-label">WP submitted</div><div class="stat-val" id="perf-wp">0</div><div class="stat-sub">Word problems</div></div>
+        <div class="stat"><div class="stat-label">Sessions</div><div class="stat-val" id="perf-sessions">1</div><div class="stat-sub">Study sessions</div></div>
+      </div>
+      <div class="card">
+        <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:18px;">MC accuracy by topic</div>
+        <div id="perf-bars"></div>
+      </div>
+    </div>
+
+  </div><!-- content -->
+</div><!-- main -->
+</div><!-- layout -->
+
+<script>
+// ===================== DATA =====================
+const TOPICS = [
+  'General Income', 'In-Kind Benefits', 'Gifts & Bequests',
+  'Recovery of Capital', 'Discharge of Indebtedness', 'Encumbered Property',
+  'Tax-Exempt Bonds', 'Imputed Income', 'Realization', 'Deductions',
+  'Assignment of Income', 'Capital Gains'
+];
+
+const FLASHCARDS = [
+  {topic:'General Income', q:'What is the Haig-Simons definition of income?', a:'Income = Consumption + Change in Net Worth. It is the broadest theoretical measure of income and the benchmark against which tax law deviations are measured.'},
+  {topic:'General Income', q:'What is the formula for taxable income?', a:'Taxable Income = Gross Income (§61) minus allowable deductions. Gross income means "all income from whatever source derived."'},
+  {topic:'General Income', q:'What are the four goals of the tax system per Prof. Raskolnikov?', a:'1. Redistribution (reduce inequality). 2. Fund public goods (non-excludable, non-rival). 3. Promote social/political policy. 4. Pay off national debt.'},
+  {topic:'General Income', q:'Under §61, what counts as gross income?', a:'All income from whatever source derived — including compensation, business income, gains from property, interest, rents, royalties, dividends, alimony, annuities, and more.'},
+  {topic:'General Income', q:'What is the difference between marginal and average tax rate?', a:'Marginal rate = rate on the last dollar of income. Average rate = total tax / total income. The US has a progressive system where marginal rates increase with income.'},
+  {topic:'General Income', q:'What is the Old Colony Trust rule?', a:'Payment of an employee\'s tax liability by the employer is income to the employee. Payments made on behalf of someone else to a third party are income to the beneficiary.'},
+  {topic:'In-Kind Benefits', q:'What are the three requirements for meal exclusion under §119?', a:'Meals must be: (1) furnished to employee/spouse/dependents, (2) for the convenience of the employer, and (3) on the business premises of the employer.'},
+  {topic:'In-Kind Benefits', q:'What extra requirement does lodging have under §119 vs. meals?', a:'Lodging requires a 4th element: employee must be REQUIRED to accept the lodging as a CONDITION OF EMPLOYMENT. Meals do not require this.'},
+  {topic:'In-Kind Benefits', q:'Why does §119(b)(1) exclude employment contracts and state statutes from determining "convenience of employer"?', a:'To prevent employers (especially states) from gaming the system by simply writing "for convenience of employer" into every contract. The substance must support it.'},
+  {topic:'In-Kind Benefits', q:'What are the §132 fringe benefit categories?', a:'(a)(1) No-additional-cost services; (a)(2) Qualified employee discounts; (a)(3) Working condition fringes; (a)(4) De minimis fringes; (a)(5) Qualified transportation; (a)(6) Qualified moving; (a)(8) Retirement planning.'},
+  {topic:'In-Kind Benefits', q:'What is a "de minimis" fringe under §132(e)?', a:'A benefit so small in value that accounting for it would be administratively impractical. E.g., occasional office snacks, holiday gifts under $25, personal use of copier. Cash is never de minimis.'},
+  {topic:'Gifts & Bequests', q:'What is the general rule under §102(a)?', a:'Gross income does NOT include the value of property acquired by gift, bequest, devise, or inheritance. The donee pays no tax on receipt.'},
+  {topic:'Gifts & Bequests', q:'What is "surrogate taxation" for gifts?', a:'Instead of taxing the donee, the donor bears the burden: the donor gets NO deduction. This avoids intrusion into personal relationships while still capturing some revenue.'},
+  {topic:'Gifts & Bequests', q:'What is the Duberstein standard for determining if a transfer is a gift?', a:'A gift must proceed from "detached and disinterested generosity, affection, respect, admiration, or charity." The INTENT of the donor controls — courts look at objective facts, not labels.'},
+  {topic:'Gifts & Bequests', q:'What does §102(c) say about employer-to-employee transfers?', a:'§102(c) categorically excludes employer-to-employee transfers from the gift exclusion. They are always taxable compensation, regardless of intent.'},
+  {topic:'Gifts & Bequests', q:'What is the basis carryover rule for gifted property under §1015?', a:'Donee takes the donor\'s basis (carryover basis). If donor\'s basis was $1,000 and FMV at gift was $5,000, donee\'s basis is $1,000. Donee is taxed on ALL appreciation when sold.'},
+  {topic:'Recovery of Capital', q:'What is the return of capital principle?', a:'A taxpayer is not taxed on the return of their own investment (basis). Only gain above the basis is taxed. This prevents double taxation of amounts already paid with after-tax dollars.'},
+  {topic:'Recovery of Capital', q:'How is gain computed under §1001?', a:'Gain = Amount Realized − Adjusted Basis. Amount realized includes cash + FMV of any property received. Basis is generally cost under §1012, adjusted under §1016.'},
+  {topic:'Discharge of Indebtedness', q:'What is the general rule for cancellation of debt (COD) income?', a:'When a debt is forgiven or discharged, the debtor has income equal to the amount discharged. This is included in gross income under §61(a)(12).'},
+  {topic:'Discharge of Indebtedness', q:'What is the key distinction for COD income? (lender repaid vs. not)', a:'COD income only arises when the lender is NOT repaid in full. If a third party (employer, parent) pays the debt in full, there is no COD — instead it is compensation or a gift.'},
+  {topic:'Discharge of Indebtedness', q:'What are the §108 exclusions from COD income?', a:'COD income is excluded if: (A) discharge in bankruptcy (Title 11); (B) taxpayer is insolvent; (C) qualified farm debt; (D) qualified real property business debt; (E) qualified principal residence debt.'},
+  {topic:'Discharge of Indebtedness', q:'What is the trade-off when COD income is excluded under §108?', a:'The excluded amount must be used to reduce tax attributes (NOLs, basis, capital loss carryovers) — §108(b). The tax burden is deferred, not eliminated.'},
+  {topic:'Encumbered Property', q:'What is the Crane rule?', a:'When property is purchased subject to a nonrecourse mortgage, the full purchase price (including the debt) is included in the buyer\'s basis. Debt is treated as if it were cash.'},
+  {topic:'Encumbered Property', q:'What is the Tufts rule for nonrecourse debt?', a:'When encumbered property is transferred, the amount realized includes the full outstanding nonrecourse debt, even if it exceeds the FMV of the property. The excess creates ordinary gain (not loss).'},
+  {topic:'Tax-Exempt Bonds', q:'Why are interest payments on state/municipal bonds excluded under §103?', a:'To subsidize state and local government borrowing. Investors accept lower yields because the interest is tax-free. The federal government effectively subsidizes state infrastructure.'},
+  {topic:'Tax-Exempt Bonds', q:'What is the arbitrage problem with §103 and §265?', a:'Without §265, investors could borrow money (deducting interest) and invest in tax-exempt bonds. §265(a)(2) disallows deductions for interest on debt used to purchase tax-exempt bonds.'},
+  {topic:'Imputed Income', q:'What is imputed income and why is it generally not taxed?', a:'Imputed income = the value of services you perform for yourself (cooking, cleaning, home ownership). Not taxed for administrative reasons (valuation) and to avoid distorting work/leisure choices.'},
+  {topic:'Realization', q:'What is the realization requirement and why does it exist?', a:'Income is not taxed until there is a realization event (typically a sale or exchange). Reasons: liquidity (no cash to pay tax on paper gains), administrability (no need to value assets annually), and political practicality.'},
+  {topic:'Realization', q:'What was Eisner v. Macomber and its rule?', a:'SCOTUS 1920: A stock dividend (pro rata distribution of additional shares) is not income under the 16th Amendment. Income requires a "severance" from capital. Still cited but narrow in scope today.'},
+  {topic:'Realization', q:'What is Treas. Reg. §1.1001-1 on realization?', a:'Gain or loss is realized when property is converted to cash OR exchanged for property that "differs materially in kind or in extent." Minor variations do not trigger realization.'},
+  {topic:'Realization', q:'Under §1041, are transfers between spouses taxable?', a:'No. §1041 provides non-recognition for transfers between spouses (or ex-spouses incident to divorce). The transferee takes the transferor\'s basis — a carryover basis.'},
+  {topic:'Deductions', q:'What is the general rule for personal expenses under §262?', a:'No deduction is allowed for personal, living, or family expenses. Consumption is not deductible — this prevents the income tax from becoming a consumption tax.'},
+  {topic:'Deductions', q:'What are "above-the-line" deductions (§62)?', a:'Deductions subtracted from gross income to get AGI. Include: trade/business expenses, self-employment taxes, alimony (pre-2019), certain IRA contributions, student loan interest. Available to all taxpayers.'},
+  {topic:'Deductions', q:'What are "below-the-line" deductions?', a:'Itemized deductions subtracted from AGI (§63): mortgage interest (§163), state/local taxes (§164 — SALT cap $10k), charitable contributions (§170), medical expenses >7.5% AGI (§213). Only if they exceed standard deduction.'},
+  {topic:'Deductions', q:'What is the medical expense deduction under §213?', a:'Medical expenses deductible to the extent they exceed 7.5% of AGI. Must be for "medical care" — diagnosis, cure, treatment, or prevention. Cosmetic surgery, personal care generally excluded.'},
+  {topic:'Deductions', q:'What is the difference between current and deferred deductions?', a:'Current (§162): expense deducted in year paid/incurred. Deferred (capitalized, §263): cost added to basis and recovered through depreciation (§167/168) or when asset is sold. Capital expenditures must be capitalized.'},
+  {topic:'Assignment of Income', q:'What is the assignment of income doctrine? (Lucas v. Earl)', a:'Income is taxed to the person who EARNS it, not who ultimately receives it. You cannot assign your future income to someone else to avoid tax. "The fruit cannot be attributed to a different tree from which it grew."'},
+  {topic:'Assignment of Income', q:'What is the distinction between Blair (income from property) and Lucas v. Earl?', a:'Blair: donating an income interest in property can shift income to donee — it\'s a gift of the property right itself. Lucas v. Earl: you cannot assign wages/services income — only the earner is taxed.'},
+  {topic:'Capital Gains', q:'What is the tax benefit of capital gains?', a:'Net capital gains are taxed at preferential rates (max 20%) rather than ordinary income rates (up to 37%). Must hold asset for >1 year (long-term). Short-term gains taxed as ordinary income.'},
+  {topic:'Capital Gains', q:'What are the policy rationales for preferential capital gains rates?', a:'(1) Bunching — gains accrue over years, taxing all at once is harsh. (2) Lock-in — high rates deter selling. (3) Inflation — some gain is illusory. (4) Incentive to invest. All are contested by Raskolnikov.'},
+  {topic:'Capital Gains', q:'What is "primarily for sale to customers" and why does it matter?', a:'Under §1221(a)(1), property held primarily for sale to customers in the ordinary course of business is NOT a capital asset. Dealers (vs. investors) get ordinary treatment — no preferential rate.'},
+];
+
+const MC_QUESTIONS = [
+  {topic:'General Income', q:'Anya receives a $10,000 bonus from her employer, which the employer reports on her W-2. Under which section is this gross income?', opts:['§102(a)','§61(a)(1)','§119','§132(a)(4)'], correct:1, exp:'§61(a)(1) includes compensation for services in gross income. §102 covers gifts, not compensation from an employer.'},
+  {topic:'In-Kind Benefits', q:'Barry\'s employer provides him a meal in the company cafeteria, on the business premises, because Barry is required to be available for emergencies. Is the meal excludable?', opts:['Yes, under §119 — on-premises, for employer\'s convenience','No — cash-equivalent meals are always taxable','Yes, under §132(e) de minimis fringes','No — only lodging qualifies under §119'], correct:0, exp:'§119 excludes meals furnished on business premises for the convenience of the employer. All three conditions are met here.'},
+  {topic:'In-Kind Benefits', q:'Under §132(e), which of the following is most likely a de minimis fringe benefit?', opts:['A $500 gift card','Occasional personal use of office printer','Company car for personal commute','Employer-paid gym membership'], correct:1, exp:'De minimis means so small it\'s administratively impractical to account for. Occasional printer use qualifies. Cash equivalents (gift cards) are never de minimis. Gym memberships have measurable value.'},
+  {topic:'Gifts & Bequests', q:'Carlos gives his friend Dana $50,000 cash as a wedding gift. What are the tax consequences to Dana?', opts:['Dana has $50,000 of gross income under §61','Dana excludes $50,000 under §102(a) — gifts are excluded','Dana must report up to $25,000 under §274(b)','Dana is taxed only on the earnings from the $50,000'], correct:1, exp:'§102(a) excludes the value of property acquired by gift from gross income. Dana owes no income tax. (Note: the donor Carlos may have gift tax obligations, but that\'s a separate tax.)'},
+  {topic:'Gifts & Bequests', q:'Under the Duberstein standard, which factor most strongly suggests a transfer is NOT a gift?', opts:['The payment followed past services rendered to the payor','The payor expressed personal affection in a letter','The transfer was of illiquid property','The payor was a family member'], correct:0, exp:'Duberstein says courts look at objective indicators of intent. Past services rendered is the clearest signal of compensation, not gift. Affection and illiquidity could support a gift.'},
+  {topic:'Gifts & Bequests', q:'Eve receives stock from her father as a gift. Father\'s basis was $1,000; FMV at gift was $8,000. Eve later sells for $12,000. What is Eve\'s gain?', opts:['$4,000 (gain above FMV at gift)','$11,000 (gain above $1,000 basis)','$0 — gifts are excluded','$7,000 (gain above FMV at gift minus exclusion)'], correct:1, exp:'Under §1015, Eve takes a carryover basis of $1,000 (father\'s original basis). Gain = $12,000 − $1,000 = $11,000. All appreciation, pre- and post-gift, is taxed to Eve upon sale.'},
+  {topic:'Discharge of Indebtedness', q:'Frank borrowed $20,000 from Citibank. Frank\'s law firm then pays Citibank the full $20,000. What is Frank\'s income?', opts:['$20,000 COD income under §61(a)(12)','$20,000 compensation income — not COD','No income — Frank did nothing','$20,000 excluded under §102 as a gift'], correct:1, exp:'The debt was repaid IN FULL by the firm, so Citibank lost nothing. No COD income. But Frank is economically better off by $20,000 — it\'s compensation (Old Colony: payment by employer on your behalf is income).'},
+  {topic:'Discharge of Indebtedness', q:'Grace is insolvent (liabilities exceed assets by $30,000). Her bank forgives $50,000 of debt. How much COD income must Grace recognize?', opts:['$50,000 — full amount','$20,000 — only to the extent solvency is restored','$0 — fully excluded under §108(b)','$30,000 — the amount of insolvency'], correct:1, exp:'Under §108(a), COD income is excluded only to the extent of insolvency. Grace was insolvent by $30,000, so $30,000 is excluded. The remaining $20,000 (which restores solvency) is included in income.'},
+  {topic:'Encumbered Property', q:'Harry purchases a building for $1M, paying $200K cash and assuming a $800K nonrecourse mortgage. What is Harry\'s basis under Crane?', opts:['$200,000 (only cash paid)','$800,000 (only the debt)','$1,000,000 (cash + debt)','$0 until the debt is paid off'], correct:2, exp:'Under Crane, when property is purchased subject to a nonrecourse mortgage, the entire purchase price — including the debt — is included in basis. Basis = $200K + $800K = $1,000,000.'},
+  {topic:'Tax-Exempt Bonds', q:'Ivy is in the 40% tax bracket. A taxable bond pays 10% interest. What yield on a tax-exempt municipal bond would leave Ivy equally well off?', opts:['10%','8%','6%','4%'], correct:2, exp:'After-tax return on taxable bond = 10% × (1−0.40) = 6%. So a tax-exempt bond paying 6% provides the same after-tax return. This is the "tax-equivalent yield."'},
+  {topic:'Realization', q:'Jack owns stock that appreciated from $10,000 to $50,000. He has not sold it. Does Jack have income?', opts:['Yes — $40,000 unrealized gain is income under §61','No — there is no realization event; no taxable income yet','Yes, but only if gain exceeds the standard deduction','No, but he must mark to market annually'], correct:1, exp:'The realization requirement means income is not taxed until a sale or exchange. Unrealized appreciation is not currently taxed (with narrow exceptions like mark-to-market for traders).'},
+  {topic:'Deductions', q:'Karen is a law professor. She pays $3,000 in dues to her local tennis club for personal recreation. Can she deduct this?', opts:['Yes, as an ordinary and necessary business expense under §162','No — §262 disallows personal expenses','Yes, as a miscellaneous itemized deduction','No, but she can deduct half under §274'], correct:1, exp:'§262 explicitly disallows deductions for personal, living, or family expenses. A tennis club for personal recreation is not a trade or business expense. No deduction.'},
+  {topic:'Deductions', q:'Louis is self-employed and pays $5,000 in health insurance premiums. This deduction is:', opts:['Below-the-line — only if he itemizes','Above-the-line — deductible under §62 without itemizing','Not deductible — personal medical expense','Only 50% deductible under §274'], correct:1, exp:'Self-employed health insurance premiums are deductible above-the-line under §162(l) — meaning Louis can deduct even if he takes the standard deduction. This is a favorable treatment for self-employed individuals.'},
+  {topic:'Assignment of Income', q:'Maria earns $100,000 in wages. She directs her employer to send $50,000 directly to her son. How much income does Maria have?', opts:['$50,000 — only what she actually receives','$100,000 — the full wages she earned','$0 — the assignment is a gift to her son','$50,000 — the son is taxed on the other $50,000'], correct:1, exp:'Lucas v. Earl: income is taxed to the person who earns it. Maria earned $100,000 in wages. Directing it to her son is an assignment of income — she cannot shift the tax. She has $100,000 in income.'},
+  {topic:'Capital Gains', q:'Nick held stock for 18 months before selling at a $20,000 gain. The stock was not held "primarily for sale to customers." What is the character of the gain?', opts:['Ordinary income','Long-term capital gain (preferential rate)','Short-term capital gain (ordinary rate)','Not taxable under §1001'], correct:1, exp:'Property held >12 months and not dealer inventory qualifies as a long-term capital asset. Long-term capital gains are taxed at preferential rates (0%, 15%, or 20% depending on income level).'},
+  {topic:'General Income', q:'Which formula best represents the Haig-Simons definition of income?', opts:['Income = Revenue − Cost of Goods Sold','Income = Consumption + ΔNet Worth','Income = Wages + Dividends + Interest','Income = AGI − Deductions'], correct:1, exp:'The Haig-Simons definition: Income = Consumption + Change in Net Worth. It is the broadest theoretical measure and the baseline against which tax preferences are measured.'},
+  {topic:'In-Kind Benefits', q:'Olivia\'s employer gives all employees a $200 Amazon gift card for the holidays. This is best characterized as:', opts:['Excludable gift under §102','Excludable de minimis fringe under §132(e)','Taxable compensation — cash equivalents are never de minimis','Excludable qualified employee discount under §132(a)(2)'], correct:2, exp:'Cash and cash equivalents (gift cards) are NEVER de minimis, regardless of amount. The IRS and courts have consistently held that even a small gift card is taxable compensation.'},
+  {topic:'Gifts & Bequests', q:'Pete\'s employer gives him a $500 watch engraved with his name as a 10-year service award. Under §102(c), this is:', opts:['A gift excluded under §102(a)','Taxable compensation — §102(c) bars employer-employee gifts','Partially excluded — the first $400 is a de minimis fringe','Excludable as a qualified employee achievement award'], correct:1, exp:'§102(c) categorically prevents employer-to-employee transfers from qualifying as gifts. The watch is compensation. (Note: separate rules under §274(j) for employee achievement awards — but §102(c) still applies for gift exclusion.)'},
+  {topic:'Realization', q:'Quinn transfers property to her spouse as part of a divorce settlement. Under §1041, what are the tax consequences?', opts:['Quinn recognizes gain on any appreciation','No gain or loss — §1041 provides non-recognition; spouse takes carryover basis','Quinn recognizes gain, but at the preferential capital gains rate','No gain recognized, and spouse gets a stepped-up basis at FMV'], correct:1, exp:'§1041: No gain or loss recognized on transfers between spouses or ex-spouses incident to divorce. The transferee takes the transferor\'s adjusted basis (carryover basis). Tax is deferred, not eliminated.'},
+  {topic:'Deductions', q:'Rachel pays $15,000 of interest on her $800,000 home acquisition mortgage. She also pays $12,000 in state income taxes. What is her SALT deduction?', opts:['$12,000','$10,000 — capped by §164(b)(6)','$15,000 — only mortgage interest','$27,000'], correct:1, exp:'SALT (state and local taxes) under §164(b)(6) is capped at $10,000 for individuals ($5,000 married filing separately). Her $12,000 in state taxes is limited to $10,000. Mortgage interest is separate under §163.'},
+  {topic:'Capital Gains', q:'A real estate developer holds 50 homes "primarily for sale to customers in the ordinary course of business." Gains on sales are:', opts:['Long-term capital gains','Short-term capital gains','Ordinary income — §1221(a)(1) excludes dealer property from capital asset treatment','Ordinary income only if held less than 1 year'], correct:2, exp:'§1221(a)(1) explicitly excludes property held primarily for sale to customers in the ordinary course of business from the definition of "capital asset." Dealers recognize ordinary income, not capital gain.'},
+  {topic:'General Income', q:'Sam wins $5,000 at a casino. Under §61, this is:', opts:['Not income — gambling is not a trade or business','Gross income — §61 includes income "from whatever source derived"','Excluded — unexpected windfalls are not income','Only taxable if Sam is a professional gambler'], correct:1, exp:'§61 is extraordinarily broad: "all income from whatever source derived." Gambling winnings are explicitly listed in the regulations and are fully taxable. Losses may be deductible only to the extent of winnings (§165(d)).'},
+  {topic:'Assignment of Income', q:'Tara owns rental property and assigns 5 years\' worth of future rent (currently worth $50,000) to her daughter as a gift. The daughter collects $10,000 in year 1. Who is taxed?', opts:['Tara — she assigned wages, which she earned','The daughter — she received the rent income','Both equally','Neither — gifts of future income are excluded under §102'], correct:0, exp:'Anticipatory assignment of earned income cannot shift the tax burden. Under the Lucas v. Earl principle, Tara, as the property owner who earned the right to the rent, is taxed. Contrast with Blair — assigning a property interest itself can shift income.'},
+  {topic:'Discharge of Indebtedness', q:'Uma is solvent and her bank reduces her mortgage principal by $30,000 because of a property defect discovered after purchase (not insolvency). Under §108(e)(5), what happens?', opts:['$30,000 is included in Uma\'s gross income as COD','The $30,000 reduces Uma\'s basis in the property — no immediate income','$30,000 is excluded as a purchase price reduction with no basis effect','$30,000 is a gift from the bank, excluded under §102'], correct:1, exp:'§108(e)(5) — purchase money debt reduction: when a solvent seller/debtor reduces purchase price debt, it is treated as a reduction in the purchase price (basis), NOT as COD income. Tax is deferred until Uma sells.'},
+  {topic:'Capital Gains', q:'Victor sells stock at a $5,000 gain and bonds at a $3,000 loss in the same year. He also has $50,000 in wages. What is the tax treatment?', opts:['$2,000 net capital gain taxed at preferential rate; wages taxed as ordinary income','$5,000 gain taxed at ordinary rate, $3,000 loss deducted from wages','$5,000 gain taxed at ordinary rate; $3,000 loss deducted only up to $3,000 from ordinary income','$2,000 net capital gain — all taxed as ordinary income since short-term'], correct:0, exp:'Capital gains and losses are netted. If net = $2,000 long-term gain, it is taxed at preferential capital gains rates. Wages are always ordinary income. (Assumes stock held >1 year.)'},
+  {topic:'Deductions', q:'Wendy\'s business expenses total $80,000 and her revenues are $60,000. She has a net operating loss (NOL) of $20,000. What generally happens to this NOL?', opts:['It is permanently lost — losses cannot exceed income','It can be carried forward to offset future income under §172','It is immediately refunded by the IRS','It converts into a tax credit dollar-for-dollar'], correct:1, exp:'§172 allows NOL carryforwards. Under current law (post-TCJA), NOLs can be carried forward indefinitely but can only offset up to 80% of taxable income in any carryforward year.'},
+  {topic:'Encumbered Property', q:'Xander transfers property with FMV of $400,000 and a nonrecourse mortgage of $600,000 (basis $200,000) to his bank in a foreclosure. Under Tufts, his amount realized is:', opts:['$400,000 (FMV of property)','$200,000 (his basis)','$600,000 (full outstanding nonrecourse debt)','$0 — foreclosure is not a taxable event'], correct:2, exp:'Tufts: when property subject to nonrecourse debt is transferred, amount realized includes the FULL outstanding debt — even exceeding FMV. Xander realizes $600,000, with basis of $200,000, so $400,000 gain.'},
+  {topic:'Tax-Exempt Bonds', q:'Yasmine borrows $100,000 from a bank at 5% to purchase municipal bonds yielding 4% (tax-free). Under §265(a)(2), she:', opts:['Can deduct $5,000 interest against $4,000 tax-exempt income for net $1,000 loss','Cannot deduct the $5,000 interest — it is incurred to purchase tax-exempt bonds','Can deduct the full $5,000 as investment interest under §163','Can deduct $4,000 (to extent of tax-exempt income)'], correct:1, exp:'§265(a)(2) disallows deductions for interest on debt used to purchase or carry tax-exempt obligations. The purpose is to prevent taxpayers from borrowing (deducting interest) to arbitrage tax-exempt returns.'},
+  {topic:'Imputed Income', q:'Zack owns his home outright (no mortgage). He does not have to pay rent. The rental value of his home is $2,000/month. This is:', opts:['$24,000 taxable imputed income per year','Not taxed — imputed income from owner-occupied housing is excluded by longstanding practice','Taxable only if Zack is in a high tax bracket','Deductible as a phantom cost of living'], correct:1, exp:'Imputed income (the value of living in your own home rent-free) is NOT taxed in the US — by administrative choice, not any specific code section. Taxing it would raise liquidity and valuation problems and is politically unpopular.'},
+  {topic:'Realization', q:'Abby exchanges her appreciated land ($50K basis, $200K FMV) for a different parcel worth $200K. Does she recognize gain?', opts:['No — same value, no economic gain','Yes — $150K gain; exchange of property differing in kind triggers realization under Treas. Reg. §1.1001-1','No — real estate exchanges are always tax-free','Yes — but only $75K (50% of gain is excluded)'], correct:1, exp:'Treas. Reg. §1.1001-1: gain/loss is realized when property is exchanged for property that differs materially in kind or extent. Land-for-different-land is a realization event. (Note: §1031 like-kind exchange may provide non-recognition — separate topic.)'},
+];
+
+const WORD_PROBLEMS = [
+  {topic:'In-Kind Benefits', q:'Alex manages the Rustic Inn, a motel along Interstate 95. His employer provides him and his family a house on the premises. Other motels of the same size require their managers to live on-site. However, Alex\'s house is nicer than most comparable managers receive.', sub:'Does Alex have gross income from the lodging? Apply §119.', answer:'§119 excludes employer-provided lodging if: (1) furnished to employee or spouse/dependents, (2) for the convenience of the employer, (3) on business premises, and (4) as a condition of employment. Here: (1) yes — Alex and family; (2) yes — on-call motel manager; (3) yes — on the motel premises; (4) arguably yes — other motels require managers to live on-site. Likely excludable. The quality of the house is irrelevant to the analysis.'},
+  {topic:'Gifts & Bequests', q:'Beth\'s law firm pays all the firm\'s associates a $5,000 "bonus" at year-end. The partners say it is a "gift reflecting their affection." Beth receives $5,000. She is an associate at the firm.', sub:'Is the $5,000 a gift under §102? Apply Duberstein and §102(c).', answer:'Under §102(c), transfers from employer to employee are categorically NOT gifts. Even if the partners have genuine affection, §102(c) bars the gift exclusion for employer-to-employee transfers. Further, under Duberstein, the payment follows services and an employment relationship — indicators of compensation, not "detached and disinterested generosity." Beth has $5,000 in gross income.'},
+  {topic:'Discharge of Indebtedness', q:'Carol borrowed $40,000 from a bank to buy a car. After a dispute, the bank agrees to forgive $15,000 of the debt in full settlement. Carol is solvent at the time of forgiveness.', sub:'What are the tax consequences to Carol?', answer:'Under §61(a)(12), discharge of indebtedness is included in gross income. Carol has $15,000 of COD income. The §108 exclusions (bankruptcy, insolvency, qualified farm/real property debt) do not apply — Carol is solvent and this is consumer debt. Carol must recognize $15,000 of ordinary income in the year of discharge.'},
+  {topic:'Deductions', q:'Dan is a criminal defense attorney. He pays $8,000 per year for a membership at an exclusive golf club. He uses the club primarily for personal relaxation on weekends, but occasionally brings clients there. He attempts to deduct the full $8,000 as a business expense.', sub:'Can Dan deduct the golf club dues? Apply §162, §262, and §274.', answer:'§162 allows deductions for ordinary and necessary business expenses. §262 disallows personal expenses. §274(a) generally disallows entertainment facility expenses. Even if some use is business-related, club dues for entertainment facilities are non-deductible under §274(a)(1)(B) — you cannot deduct dues for clubs organized for entertainment purposes. Dan cannot deduct the $8,000.'},
+  {topic:'Capital Gains', q:'Elena is a real estate investor who buys distressed homes, renovates them, and sells them quickly — typically within 6 months. She has sold 20 homes this year. She claims long-term capital gains treatment because real estate is §1221 "property."', sub:'Is Elena entitled to capital gains treatment? Analyze §1221(a)(1).', answer:'Under §1221(a)(1), property held "primarily for sale to customers in the ordinary course of a trade or business" is excluded from the definition of "capital asset." Elena\'s pattern — volume of sales, quick turnaround, active renovation — strongly suggests she is a dealer, not an investor. Courts look at frequency, continuity, and purpose. Elena likely has ordinary income, not capital gains.'},
+  {topic:'Assignment of Income', q:'Frank, a surgeon, earns $500,000 annually. He assigns 20% of his future surgical fees to a family trust for his children\'s benefit. The hospital pays the trust directly.', sub:'Who is taxed on the surgical income? Apply Lucas v. Earl.', answer:'Under Lucas v. Earl, income is taxed to the person who earns it — the "tree" cannot be separated from its "fruit." Frank\'s surgical fees are earned by his personal services. No matter how he directs payment, the income is taxable to Frank. The assignment to the trust does not shift the tax obligation. Frank must include 100% of his surgical fees ($500,000) in his gross income.'},
+  {topic:'Recovery of Capital', q:'Grace purchased 100 shares of stock for $10,000. She receives a $3,000 distribution from the corporation labeled "return of capital." She later sells the shares for $12,000.', sub:'What is the tax consequence of the distribution and the later sale?', answer:'A "return of capital" distribution reduces the shareholder\'s basis rather than generating current income — it is not included in gross income. Grace\'s basis is reduced from $10,000 to $7,000. When she later sells for $12,000, her gain is $12,000 − $7,000 = $5,000 (capital gain). If basis reaches zero, subsequent distributions are capital gain.'},
+  {topic:'Realization', q:'Harry owns farmland with a $100,000 basis and $400,000 FMV. He transfers it to his wife Irene as part of their divorce settlement agreement, signed in the same year their marriage ends.', sub:'Does Harry recognize gain on the transfer? What is Irene\'s basis?', answer:'Under §1041, no gain or loss is recognized on transfers of property between spouses or to a former spouse incident to divorce. Harry recognizes no gain despite the $300,000 unrealized appreciation. Irene takes Harry\'s carryover basis of $100,000. If Irene later sells for $400,000, she will recognize $300,000 of gain — the tax is deferred, not forgiven.'},
+  {topic:'In-Kind Benefits', q:'Julia works for an airline. She flies standby for free on routes her employer operates, using seats that would otherwise be empty. The retail value of the flights is $2,000/year.', sub:'Is Julia taxed on these flights? Apply §132(a)(1).', answer:'§132(a)(1) excludes "no-additional-cost services" from gross income. Requirements: (1) service offered for sale to customers in the ordinary course of employer\'s line of business; (2) employer incurs no substantial additional cost (including forgone revenue). Empty standby seats = no forgone revenue and no additional cost. Julia\'s flights are excluded. The full $2,000 is excluded from gross income.'},
+  {topic:'Tax-Exempt Bonds', q:'Kevin is in the 37% tax bracket. He is choosing between a taxable corporate bond yielding 8% and a municipal bond yielding 5.5%. Both have the same risk and maturity.', sub:'Which bond provides a better after-tax return? Show your work.', answer:'After-tax return on corporate bond = 8% × (1 − 0.37) = 5.04%. Municipal bond return = 5.5% (tax-free, no calculation needed). 5.5% > 5.04%, so Kevin should prefer the municipal bond. Tax-equivalent yield of the muni = 5.5% / (1 − 0.37) = 8.73% — meaning it is equivalent to a taxable bond paying 8.73%.'},
+  {topic:'Deductions', q:'Linda is a freelance writer who works from a dedicated room in her apartment. The room is 200 sq ft out of her 1,000 sq ft apartment. She pays $24,000/year in rent. She uses the room exclusively and regularly for her writing business.', sub:'Can Linda deduct home office expenses? How much?', answer:'Under §280A, a self-employed person may deduct home office expenses if the space is used exclusively and regularly as the principal place of business. Linda qualifies. Deductible rent = 200/1,000 × $24,000 = $4,800. The deduction is above-the-line for self-employed (§62(a)(1)) and is not subject to the employee home office limitation (which was eliminated post-TCJA for W-2 employees).'},
+  {topic:'Capital Gains', q:'Mark sold stock after holding it for 14 months for a $30,000 gain. Mark also sold a painting held for 8 months at a $5,000 gain. Mark\'s ordinary income tax rate is 32%.', sub:'What is the tax treatment of each gain?', answer:'Stock (14 months): long-term capital gain — taxed at preferential rates (15% or 20% depending on total income). Likely 15% if Mark\'s total income is under the threshold (~$518K for 2025 single filers). Painting (8 months): short-term capital gain — held less than 12 months, taxed as ordinary income at 32%. Total tax = (approx.) $30,000 × 15% = $4,500 + $5,000 × 32% = $1,600 = $6,100.'},
+];
+
+// ===================== STATE =====================
+const state = {
+  fc: { topic: 'All', idx: 0, filtered: [], seen: new Set() },
+  mc: { topic: 'All', idx: 0, filtered: [], score: 0, total: 0, topicScores: {} },
+  wp: { topic: 'All', idx: 0, filtered: [] },
+  timed: { active: false, interval: null, remaining: 5400, answered: {}, idx: 0, filtered: [] },
+  soc: { history: [], topic: 'General Income' },
+  perf: { fcseen: 0, wpsub: 0, sessions: 1 }
+};
+
+// ===================== NAV =====================
+function go(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+  const titles = { dashboard:'Dashboard', flashcards:'Flashcards', mc:'Multiple Choice', wordproblems:'Word Problems', timed:'Timed Exam', socratic:'Socratic Mode', outline:'Course Outline', performance:'Performance' };
+  document.getElementById('topbar-title').textContent = titles[id] || id;
+  if (id === 'performance') updatePerf();
+}
+
+// ===================== COUNTDOWN =====================
+function updateCountdown() {
+  const examDate = new Date('2026-05-10T09:00:00');
+  const now = new Date();
+  const diff = examDate - now;
+  if (diff < 0) { document.getElementById('cdval').textContent = 'Exam day!'; return; }
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  document.getElementById('cdval').textContent = d + 'd ' + h + 'h';
+}
+updateCountdown();
+setInterval(updateCountdown, 60000);
+
+// ===================== CHIPS BUILDER =====================
+function buildChips(containerId, current, setCurrent, topics, onChange) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  ['All', ...topics].forEach(t => {
+    const c = document.createElement('button');
+    c.className = 'chip' + (t === current ? ' active' : '');
+    c.textContent = t;
+    c.onclick = () => { setCurrent(t); buildChips(containerId, t, setCurrent, topics, onChange); onChange(t); };
+    el.appendChild(c);
+  });
+}
+
+// ===================== FLASHCARDS =====================
+function filterFC(topic) {
+  state.fc.topic = topic;
+  state.fc.filtered = topic === 'All' ? [...FLASHCARDS] : FLASHCARDS.filter(f => f.topic === topic);
+  state.fc.idx = 0;
+  renderFC();
+}
+
+function renderFC() {
+  const cards = state.fc.filtered;
+  if (!cards.length) return;
+  const c = cards[state.fc.idx];
+  document.getElementById('fc').classList.remove('flipped');
+  setTimeout(() => {
+    document.getElementById('fc-topic-tag').textContent = c.topic;
+    document.getElementById('fc-q').textContent = c.q;
+    document.getElementById('fc-a').textContent = c.a;
+    document.getElementById('fc-ctr').textContent = (state.fc.idx + 1) + ' / ' + cards.length;
+    document.getElementById('fc-prev').disabled = state.fc.idx === 0;
+    document.getElementById('fc-next').disabled = state.fc.idx === cards.length - 1;
+  }, 50);
+  state.fc.seen.add(state.fc.idx + '_' + state.fc.topic);
+  state.perf.fcseen++;
+}
+
+function flipCard() { document.getElementById('fc').classList.toggle('flipped'); }
+
+function fcNav(dir) {
+  const len = state.fc.filtered.length;
+  state.fc.idx = Math.max(0, Math.min(len - 1, state.fc.idx + dir));
+  document.getElementById('fc').classList.remove('flipped');
+  setTimeout(renderFC, 50);
+}
+
+document.addEventListener('keydown', e => {
+  const fs = document.getElementById('sec-flashcards');
+  if (!fs.classList.contains('active')) return;
+  if (e.key === 'ArrowLeft') fcNav(-1);
+  if (e.key === 'ArrowRight') fcNav(1);
+  if (e.key === ' ') { e.preventDefault(); flipCard(); }
+});
+
+buildChips('fc-chips', 'All', t => {}, TOPICS, filterFC);
+filterFC('All');
+
+// ===================== MULTIPLE CHOICE =====================
+let mcAnswered = false;
+
+function filterMC(topic) {
+  state.mc.topic = topic;
+  state.mc.filtered = topic === 'All' ? [...MC_QUESTIONS] : MC_QUESTIONS.filter(q => q.topic === topic);
+  state.mc.idx = 0;
+  mcAnswered = false;
+  renderMC();
+}
+
+function renderMC() {
+  const qs = state.mc.filtered;
+  if (!qs.length) return;
+  const q = qs[state.mc.idx];
+  mcAnswered = false;
+  document.getElementById('mc-meta').textContent = 'Question ' + (state.mc.idx + 1) + ' of ' + qs.length;
+  document.getElementById('mc-q').textContent = q.q;
+  document.getElementById('mc-next').disabled = true;
+  const fb = document.getElementById('mc-feedback');
+  fb.className = 'feedback';
+  fb.style.display = 'none';
+  const opts = document.getElementById('mc-opts');
+  opts.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const b = document.createElement('button');
+    b.className = 'mc-opt';
+    b.textContent = String.fromCharCode(65 + i) + '. ' + opt;
+    b.onclick = () => answerMC(i, q);
+    opts.appendChild(b);
+  });
+  updateMCScore();
+}
+
+function answerMC(chosen, q) {
+  if (mcAnswered) return;
+  mcAnswered = true;
+  const opts = document.querySelectorAll('#mc-opts .mc-opt');
+  opts.forEach((b, i) => {
+    b.disabled = true;
+    if (i === q.correct) b.classList.add('correct');
+    else if (i === chosen && chosen !== q.correct) b.classList.add('incorrect');
+  });
+  const correct = chosen === q.correct;
+  if (correct) { state.mc.score++; }
+  state.mc.total++;
+  const topic = state.mc.filtered[state.mc.idx].topic;
+  if (!state.mc.topicScores[topic]) state.mc.topicScores[topic] = { c: 0, t: 0 };
+  if (correct) state.mc.topicScores[topic].c++;
+  state.mc.topicScores[topic].t++;
+  const fb = document.getElementById('mc-feedback');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'bad');
+  fb.style.display = 'block';
+  fb.innerHTML = (correct ? '✓ Correct! ' : '✗ Incorrect. ') + q.exp;
+  document.getElementById('mc-next').disabled = false;
+  updateMCScore();
+}
+
+function nextMC() {
+  const len = state.mc.filtered.length;
+  if (state.mc.idx < len - 1) { state.mc.idx++; renderMC(); }
+  else { document.getElementById('mc-feedback').innerHTML = '<strong>Section complete!</strong> Score: ' + state.mc.score + '/' + state.mc.total; }
+}
+
+function updateMCScore() {
+  const el = document.getElementById('mc-score-display');
+  if (el) el.textContent = 'Score: ' + state.mc.score + '/' + state.mc.total;
+}
+
+buildChips('mc-chips', 'All', t => {}, TOPICS, filterMC);
+filterMC('All');
+
+// ===================== WORD PROBLEMS =====================
+function filterWP(topic) {
+  state.wp.topic = topic;
+  state.wp.filtered = topic === 'All' ? [...WORD_PROBLEMS] : WORD_PROBLEMS.filter(p => p.topic === topic);
+  state.wp.idx = 0;
+  renderWP();
+}
+
+function renderWP() {
+  const ps = state.wp.filtered;
+  if (!ps.length) return;
+  const p = ps[state.wp.idx];
+  document.getElementById('wp-meta').textContent = 'Problem ' + (state.wp.idx + 1) + ' of ' + ps.length;
+  document.getElementById('wp-q').textContent = p.q;
+  document.getElementById('wp-sub').textContent = p.sub;
+  document.getElementById('wp-ta').value = '';
+  document.getElementById('wp-feedback').className = 'ai-box';
+  document.getElementById('wp-next').style.display = 'none';
+  document.getElementById('wp-submit').style.display = 'inline-block';
+}
+
+async function submitWP() {
+  const answer = document.getElementById('wp-ta').value.trim();
+  if (!answer) { alert('Please write an answer first.'); return; }
+  const p = state.wp.filtered[state.wp.idx];
+  document.getElementById('wp-loading').style.display = 'flex';
+  document.getElementById('wp-submit').disabled = true;
+  state.perf.wpsub++;
+
+  const prompt = `You are Professor Alex Raskolnikov from Columbia Law School teaching Federal Income Tax, Spring 2026. You are grading a 1L student's answer to a word problem on the exam.
+
+PROBLEM: ${p.q}
+QUESTION: ${p.sub}
+MODEL ANSWER: ${p.answer}
+STUDENT'S ANSWER: ${answer}
+
+Grade the student's answer on a scale of 0-10. Consider:
+1. Did they identify the correct IRC sections?
+2. Did they apply the correct legal test/framework?
+3. Is the analysis correct?
+4. Is the conclusion correct?
+5. Is it concise — one or two sentences per sub-issue with a code cite?
+
+Respond in this format:
+SCORE: [X/10]
+FEEDBACK: [2-4 sentences of specific, Socratic feedback pointing out what they got right, what they missed, and what code sections or cases they should have cited. Be direct but constructive, like Raskolnikov in class.]`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content.map(b => b.text || '').join('');
+    const scoreMatch = text.match(/SCORE:\s*(\d+)\/10/i);
+    const feedbackMatch = text.match(/FEEDBACK:\s*([\s\S]+)/i);
+    const score = scoreMatch ? parseInt(scoreMatch[1]) : 5;
+    const feedback = feedbackMatch ? feedbackMatch[1].trim() : text;
+    const badgeClass = score >= 8 ? 'score-hi' : score >= 5 ? 'score-mid' : 'score-lo';
+    document.getElementById('wp-score-badge').innerHTML = `<span class="score ${badgeClass}">${score}/10</span>`;
+    document.getElementById('wp-feedback-body').textContent = feedback;
+    document.getElementById('wp-feedback').className = 'ai-box show';
+    document.getElementById('wp-next').style.display = 'inline-block';
+  } catch (e) {
+    document.getElementById('wp-feedback-body').textContent = 'Could not connect to AI grader. Check your internet connection.';
+    document.getElementById('wp-feedback').className = 'ai-box show';
+  }
+  document.getElementById('wp-loading').style.display = 'none';
+  document.getElementById('wp-submit').disabled = false;
+}
+
+function nextWP() {
+  const len = state.wp.filtered.length;
+  if (state.wp.idx < len - 1) { state.wp.idx++; renderWP(); }
+}
+
+buildChips('wp-chips', 'All', t => {}, TOPICS, filterWP);
+filterWP('All');
+
+// ===================== TIMED EXAM =====================
+let timedInterval = null;
+
+function startTimed() {
+  state.timed.remaining = 5400;
+  state.timed.answered = {};
+  state.timed.idx = 0;
+  state.timed.filtered = [...MC_QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 15);
+  document.getElementById('timed-start-screen').style.display = 'none';
+  document.getElementById('timed-exam-screen').style.display = 'block';
+  buildQGrid();
+  renderTimedQ();
+  timedInterval = setInterval(tickTimer, 1000);
+}
+
+function tickTimer() {
+  state.timed.remaining--;
+  const r = state.timed.remaining;
+  const h = Math.floor(r / 3600);
+  const m = Math.floor((r % 3600) / 60);
+  const s = r % 60;
+  const display = h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+  const el = document.getElementById('exam-timer');
+  el.textContent = display;
+  el.className = 'timer' + (r < 300 ? ' crit' : r < 900 ? ' warn' : '');
+  if (r <= 0) endTimed();
+}
+
+function buildQGrid() {
+  const grid = document.getElementById('q-grid');
+  grid.innerHTML = '';
+  state.timed.filtered.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'q-dot' + (i === 0 ? ' curr' : '');
+    d.textContent = i + 1;
+    d.id = 'qdot-' + i;
+    d.onclick = () => goToTimedQ(i);
+    grid.appendChild(d);
+  });
+}
+
+function goToTimedQ(i) {
+  state.timed.idx = i;
+  renderTimedQ();
+}
+
+function renderTimedQ() {
+  const qs = state.timed.filtered;
+  const i = state.timed.idx;
+  const q = qs[i];
+  document.getElementById('timed-meta').textContent = 'Question ' + (i + 1) + ' of 15' + (i >= 11 ? ' ★ Weighted' : '');
+  document.getElementById('timed-q').textContent = q.q;
+  document.getElementById('timed-next').disabled = true;
+  document.getElementById('timed-feedback').className = 'feedback';
+  document.querySelectorAll('.q-dot').forEach((d, j) => {
+    d.className = 'q-dot' + (state.timed.answered[j] !== undefined ? ' done' : '') + (j === i ? ' curr' : '');
+  });
+  const opts = document.getElementById('timed-opts');
+  opts.innerHTML = '';
+  const already = state.timed.answered[i];
+  q.opts.forEach((opt, j) => {
+    const b = document.createElement('button');
+    b.className = 'mc-opt';
+    b.textContent = String.fromCharCode(65 + j) + '. ' + opt;
+    if (already !== undefined) {
+      b.disabled = true;
+      if (j === q.correct) b.classList.add('correct');
+      else if (j === already) b.classList.add('incorrect');
+    } else {
+      b.onclick = () => answerTimed(j, q, i);
+    }
+    opts.appendChild(b);
+  });
+  if (already !== undefined) {
+    const fb = document.getElementById('timed-feedback');
+    const ok = already === q.correct;
+    fb.className = 'feedback show ' + (ok ? 'ok' : 'bad');
+    fb.textContent = (ok ? '✓ ' : '✗ ') + q.exp;
+    document.getElementById('timed-next').disabled = false;
+  }
+}
+
+function answerTimed(chosen, q, qi) {
+  if (state.timed.answered[qi] !== undefined) return;
+  state.timed.answered[qi] = chosen;
+  renderTimedQ();
+}
+
+function nextTimed() {
+  if (state.timed.idx < 14) { state.timed.idx++; renderTimedQ(); }
+  else endTimed();
+}
+
+function endTimed() {
+  clearInterval(timedInterval);
+  const total = Object.keys(state.timed.answered).length;
+  const correct = Object.entries(state.timed.answered).filter(([i, a]) => state.timed.filtered[i].correct === a).length;
+  document.getElementById('timed-exam-screen').style.display = 'none';
+  document.getElementById('timed-results-screen').style.display = 'block';
+  document.getElementById('final-score').textContent = correct + '/15';
+  document.getElementById('final-detail').textContent = 'You answered ' + total + ' questions. ' + Math.round(correct / 15 * 100) + '% correct.';
+  if (!state.mc.topicScores['_timed']) state.mc.topicScores['_timed'] = { c: correct, t: 15 };
+}
+
+function resetTimed() {
+  document.getElementById('timed-results-screen').style.display = 'none';
+  document.getElementById('timed-start-screen').style.display = 'block';
+}
+
+// ===================== SOCRATIC =====================
+const SOC_STARTERS = {
+  'General Income': 'OK, let\'s start. Suppose someone finds $500 cash on the street and keeps it. Do they have income? Tell me the relevant code section and the policy reason.',
+  'In-Kind Benefits': 'Your client\'s employer provides free meals at a company cafeteria. The cafeteria is open to all employees at lunchtime, not just on-call workers. Does §119 apply? Walk me through the test.',
+  'Gifts & Bequests': 'A senior partner gives an associate a Rolex watch after the associate brings in a major client. The partner says it is a personal gift. Is it? Apply Duberstein and §102(c).',
+  'Discharge of Indebtedness': 'A bank forgives $80,000 of a taxpayer\'s mortgage because they are insolvent by $50,000. How much income does the taxpayer recognize? Apply §108.',
+  'Capital Gains': 'A taxpayer buys land, builds 30 houses over 3 years, and sells them all. She argues she holds capital assets entitled to preferential rates. What is the argument against her?',
+  'Deductions': 'Dan pays $20,000 for a home office that he uses 60% for business and 40% for personal use. He wants to deduct the full amount. Where does he go wrong?',
+  'Realization': 'Abby exchanges her $200,000 stock portfolio for a different stock portfolio also worth $200,000. No money changes hands. Has she realized gain? What if the stocks were in the same company?',
+  'Assignment of Income': 'A famous surgeon assigns her right to collect next year\'s surgical fees to her son as a gift. Does the son pay the tax? Apply Lucas v. Earl and distinguish Blair.',
+};
+
+function buildSocChips() {
+  buildChips('soc-chips', state.soc.topic, t => { state.soc.topic = t; }, TOPICS, t => { state.soc.topic = t; newSocratic(); });
+}
+
+async function newSocratic() {
+  state.soc.history = [];
+  const msgs = document.getElementById('chat-msgs');
+  msgs.innerHTML = '';
+  const topic = state.soc.topic || 'General Income';
+  const starter = SOC_STARTERS[topic] || SOC_STARTERS['General Income'];
+  appendMsg('prof', starter);
+  state.soc.history.push({ role: 'assistant', content: starter });
+}
+
+function appendMsg(who, text) {
+  const msgs = document.getElementById('chat-msgs');
+  const d = document.createElement('div');
+  d.className = 'chat-msg ' + (who === 'prof' ? 'msg-prof' : 'msg-you');
+  d.textContent = text;
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function chatKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-in');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  appendMsg('you', text);
+  state.soc.history.push({ role: 'user', content: text });
+  document.getElementById('chat-loading').style.display = 'flex';
+  document.getElementById('chat-send').disabled = true;
+
+  const sysPrompt = `You are Professor Alex Raskolnikov, a tax law professor at Columbia Law School, teaching Federal Income Tax in Spring 2026. You are conducting a Socratic dialogue with a 1L student. Your style: direct, intellectually rigorous, slightly provocative, uses hypotheticals, pushes students to think deeper, asks "why?" constantly, references IRC sections by number, cites cases like Old Colony, Duberstein, Lucas v. Earl, Crane, Tufts, Eisner v. Macomber. You do NOT give away answers easily. You push back, introduce complications, and challenge weak analysis. Keep responses to 2-4 sentences. Current topic: ${state.soc.topic}.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: sysPrompt,
+        messages: state.soc.history
+      })
+    });
+    const data = await res.json();
+    const reply = data.content.map(b => b.text || '').join('').trim();
+    appendMsg('prof', reply);
+    state.soc.history.push({ role: 'assistant', content: reply });
+  } catch (e) {
+    appendMsg('prof', 'I seem to be having a technical issue. Let\'s try again.');
+  }
+  document.getElementById('chat-loading').style.display = 'none';
+  document.getElementById('chat-send').disabled = false;
+}
+
+buildSocChips();
+newSocratic();
+
+// ===================== OUTLINE =====================
+const OUTLINE_DATA = [
+  { title: 'Income — General Concepts (A1)', content: `<strong>Core rule:</strong> §61 — "Gross income means all income from whatever source derived."<br><br><strong>Haig-Simons:</strong> Income = Consumption + ΔNet Worth. The broadest possible definition.<br><br><strong>Goals of tax system:</strong><ol><li>Redistribution — reduce inequality</li><li>Fund public goods (non-exclusive, non-rival)</li><li>Social/political policy</li><li>Pay national debt</li></ol><br><strong>Key cases:</strong> Old Colony Trust (employer pays your tax = your income). <code>§61, §1</code>` },
+  { title: 'Income — In-Kind Benefits (A2)', content: `<strong>§119 — Meals & Lodging:</strong><br>Meals excludable if: (1) furnished to employee, (2) for convenience of employer, (3) on business premises.<br>Lodging: add (4) required as condition of employment.<br><code>§119(b)(1)</code>: employment contract/state statute not determinative.<br><br><strong>§132 Fringe benefits:</strong> No-additional-cost services, qualified employee discounts, working condition fringes, de minimis fringes, qualified transportation.<br>De minimis = too small to account for. <strong>Cash is NEVER de minimis.</strong><br><br><strong>Key cases:</strong> Kowalski (meal allowance ≠ "furnished meals"), Benaglia (hotel manager lodging).` },
+  { title: 'Income — Gifts & Bequests (A3)', content: `<strong>§102(a):</strong> Gross income does NOT include value of property acquired by gift, bequest, devise, or inheritance.<br><br><strong>Surrogate taxation:</strong> Donor bears burden (no deduction). Donee pays no tax on receipt.<br><br><strong>Duberstein standard:</strong> Gift requires "detached and disinterested generosity." Courts look at INTENT from objective facts. Employer-to-employee = almost never a gift.<br><br><strong>§102(c):</strong> Employer → employee transfers are categorically NOT gifts.<br><strong>§274(b):</strong> Business gifts deductible only up to $25/person.<br><strong>§1015:</strong> Carryover basis — donee takes donor's basis. All pre- and post-gift appreciation taxed to donee upon sale.<br><br><strong>Key cases:</strong> Duberstein & Stanton (SCOTUS 1960), Taft v. Bowers (§1015 constitutional).` },
+  { title: 'Income — Recovery of Capital (A4)', content: `<strong>Return of capital principle:</strong> Taxpayer is NOT taxed on the return of their investment (basis). Only gain above basis is taxed.<br><br><strong>§1001:</strong> Gain = Amount Realized − Adjusted Basis.<br>Amount realized = cash + FMV of any property received.<br>Basis = generally cost (§1012), adjusted under §1016.<br><br><strong>Life insurance:</strong> Proceeds generally excluded under §101(a). Exceptions: transfer for value rule.<br><strong>Annuities:</strong> Each payment partially return of investment, partially income — §72 exclusion ratio.` },
+  { title: 'Income — Discharge of Indebtedness (A5)', content: `<strong>General rule:</strong> COD income included under §61(a)(12) when lender does NOT receive full repayment.<br><br><strong>Key distinction:</strong> If third party pays debt in full → NO COD income (income is compensation or gift instead).<br><br><strong>§108 exclusions:</strong> (A) Bankruptcy; (B) Insolvency (excluded only to extent of insolvency); (C) Qualified farm debt; (D) QRPBI; (E) Qualified principal residence debt.<br><br><strong>Trade-off:</strong> Excluded COD → reduce tax attributes (§108(b)): NOLs first, then capital loss carryovers, then basis. Tax deferred, not forgiven.<br><br><strong>§108(e)(5):</strong> Solvent debtor + purchase money debt reduction → basis reduction only (no COD income).` },
+  { title: 'Income — Sales of Encumbered Property (A6)', content: `<strong>Crane rule:</strong> Purchase price (including nonrecourse debt) included in buyer's basis AND seller's amount realized.<br><br><strong>Tufts rule:</strong> Amount realized on transfer of encumbered property = full outstanding nonrecourse debt, even if > FMV.<br>Result: gain even when property is "underwater."<br><br><strong>Woodsam:</strong> Refinancing (borrowing more against property) is NOT a realization event — no tax on mortgage proceeds.` },
+  { title: 'Income — Tax-Exempt Bonds (A7)', content: `<strong>§103:</strong> Interest on state/local obligations excluded from gross income. Purpose: subsidize government borrowing.<br><br><strong>Tax-equivalent yield:</strong> Muni yield / (1 − marginal rate) = equivalent taxable yield.<br><br><strong>Arbitrage problem:</strong> Borrowing to invest in munis generates deductible interest + tax-free income.<br><strong>§265(a)(2):</strong> Interest on debt to purchase/carry tax-exempt bonds is NOT deductible.<br><strong>§148:</strong> Arbitrage restrictions on bond issuers.<br><br><strong>Policy debate:</strong> Repealing §265 vs. §148 — see TA Session 7 slides.` },
+  { title: 'Income — Imputed Income (A8)', content: `<strong>Imputed income:</strong> Value of services performed for yourself (cooking, home ownership, DIY repairs). NOT taxed in the US.<br><br><strong>Why not taxed:</strong> Administrative impossibility, valuation problems, would penalize self-sufficient individuals and distort labor choices.<br><br><strong>Implication:</strong> Favors homeowners over renters. A homeowner's "rent" to themselves is not taxed; a renter's payments come from after-tax income but no offsetting exclusion.` },
+  { title: 'Realization — Origins (A9)', content: `<strong>Realization requirement:</strong> Income not taxed until there is a realization event — typically a sale or exchange. Unrealized appreciation is NOT taxed.<br><br><strong>Reasons:</strong> Liquidity, administrability (no need to value annually), political practicality.<br><br><strong>Eisner v. Macomber (1920):</strong> Stock dividend = not income. Requires "severance" from capital. Narrow but still cited.<br><strong>Helvering v. Bruun (1940):</strong> Lease termination + building reversion = realization event.<br><strong>Woodsam (2d Cir.):</strong> Refinancing not a realization event.<br><br><strong>Treas. Reg. §1.1001-1:</strong> Exchange of property differing materially in kind or extent triggers realization.` },
+  { title: 'Realization — Special Cases (A10)', content: `<strong>§1041:</strong> No gain/loss on transfers between spouses or ex-spouses incident to divorce. Transferee takes carryover basis. Tax deferred, not eliminated.<br><br><strong>U.S. v. Davis (1962):</strong> Pre-§1041, transfer of appreciated property in divorce = taxable. §1041 reversed this result.<br><strong>Farid-Es-Sultaneh (2d Cir. 1947):</strong> Property transferred in exchange for giving up marital rights = sale, not gift. Transferee gets FMV basis.` },
+  { title: 'Realization — Modern Approach (A11)', content: `<strong>§7701(o) — Economic Substance Doctrine:</strong> Transaction must have economic substance (objective non-tax purpose OR subjective non-tax purpose) to be respected. Two-prong test.<br><br><strong>Only applies when "economic substance is relevant"</strong> — still unclear after 16 years of §7701(o). No appellate decision yet.<br><br><strong>Revenue Ruling on contract modification:</strong> Material modification of a financial instrument = realization event.<br><br><strong>Key principle:</strong> If Raskolnikov is debating whether something is testable in class → it will NOT be on the exam.` },
+  { title: 'Deductions — Introduction (A12)', content: `<strong>Three key deduction questions:</strong><ol><li>Personal or business? (§162 vs. §262)</li><li>Trade/business or investment? (§162 vs. §212)</li><li>Current or deferred? (§162 current vs. §263 capitalize)</li></ol><br><strong>§162:</strong> Ordinary and necessary expenses of trade or business — deductible in year incurred.<br><strong>§262:</strong> Personal/living/family expenses — NOT deductible. Consumption is not deductible.<br><strong>§263:</strong> Capital expenditures must be capitalized (added to basis), not currently deducted.<br><strong>§§167/168:</strong> Depreciation — cost recovery over asset's useful life.` },
+  { title: 'Deductions — Personal (A13)', content: `<strong>Itemized deductions</strong> (below-the-line, only if > standard deduction):<br><br><code>§163</code> Interest: Qualified residence interest (acquisition debt ≤ $750K), investment interest, trade or business interest.<br><code>§164</code> SALT: State/local income, property taxes — CAPPED at $10,000 (§164(b)(6), TCJA).<br><code>§170</code> Charitable contributions: FMV of property contributed, subject to AGI limits.<br><code>§213</code> Medical expenses: Exceeding 7.5% of AGI. Qualified medical care only — NOT cosmetic surgery, personal care, payments to relatives.<br><code>§165</code> Losses: Casualty/theft losses, investment losses (limited).` },
+  { title: 'Deductions — Business vs. Personal (A14-15)', content: `<strong>Is there a trade or business?</strong> Hobby losses (§183) — must have profit motive. Nickerson factors: regularity, profit motive, expertise.<br><strong>§280A:</strong> Home office — exclusive + regular use as principal place of business. Self-employed: above-the-line. Employees: NOT deductible post-TCJA.<br><br><strong>Is there a business connection?</strong> Commuting = personal (§262). Clothing = personal unless required AND not adaptable for general use. Education = deductible if maintains/improves existing skills, NOT deductible if qualifies for new career.<br><br><strong>Key cases:</strong> Nickerson (hobby vs. business), Gilliam (clothing), Welch v. Helvering (ordinary and necessary).` },
+  { title: 'Deductions — Business Current vs. Deferred (A16)', content: `<strong>Current expense (§162):</strong> Ordinary and necessary, incurred in current year business operation. Deduct NOW.<br><br><strong>Capital expenditure (§263):</strong> Cost with benefit extending substantially beyond tax year → CAPITALIZE. Add to basis. Recover through depreciation.<br><br><strong>§167/168 MACRS:</strong> Modified Accelerated Cost Recovery System — depreciate over specified recovery periods. Faster write-off than economic life.<br><strong>§179:</strong> Immediate expensing of certain business assets (up to $1M+).<br><strong>§1016:</strong> Depreciation deductions reduce adjusted basis.<br><br><strong>Encyclopedia Britannica case:</strong> Development costs for long-lived assets must be capitalized.` },
+  { title: 'Assignment of Income (A17)', content: `<strong>Lucas v. Earl:</strong> Income taxed to the person who EARNS it. Cannot assign wages/services income to shift tax. "Fruit cannot be attributed to a different tree from which it grew."<br><br><strong>Blair v. Commissioner:</strong> Donating an income interest in a trust = gift of a PROPERTY RIGHT. Income from that interest is taxable to donee/assignee — distinguishable from earned income.<br><br><strong>Key distinction:</strong> Services income → always taxed to earner (Lucas). Property income → if you actually transfer the property right itself, income can follow (Blair). But anticipatory assignment of already-accrued income doesn't work.` },
+  { title: 'Capital Gains — Overview (A18)', content: `<strong>Net capital gains:</strong> Taxed at preferential rates (0%/15%/20%) rather than ordinary rates (up to 37%).<br>Must be a "capital asset" held > 12 months (long-term).<br><br><strong>§1221(a)(1):</strong> Property held primarily for sale to customers (dealer inventory) is NOT a capital asset → ordinary income.<br><br><strong>Policy rationales (all contested by Raskolnikov):</strong><ol><li>Bunching — gains accrue over years</li><li>Lock-in — high rates prevent sales</li><li>Inflation — some gain is illusory</li><li>Investment incentive</li></ol><br><strong>Net capital loss:</strong> Can offset capital gains + up to $3,000 of ordinary income (§1211(b)).` },
+  { title: 'Capital Gains — Business Hedging (A19)', content: `<strong>Arkansas Best (SCOTUS 1988):</strong> Stock purchased to protect business operations is still a capital asset. "Motive" for buying does not change character.<br><br><strong>Business hedging exception:</strong> Narrowly, hedging transactions entered into in the normal course of business and identified as hedges → ordinary treatment under Treas. Reg. §1.1221-2.<br><br><strong>Policy:</strong> Ordinary treatment for hedges ensures that a company's risk-management costs are ordinary deductions matching ordinary income. Pure investment = capital.` },
+];
+
+function buildOutline() {
+  const el = document.getElementById('outline-content');
+  el.innerHTML = '';
+  OUTLINE_DATA.forEach((item, i) => {
+    const ot = document.createElement('div');
+    ot.className = 'ot';
+    ot.innerHTML = `<button class="ot-toggle" onclick="toggleOT(${i})"><span>${item.title}</span><span class="ot-arrow" id="ot-arrow-${i}">▶</span></button><div class="ot-body" id="ot-body-${i}">${item.content}</div>`;
+    el.appendChild(ot);
+  });
+}
+
+function toggleOT(i) {
+  const body = document.getElementById('ot-body-' + i);
+  const arrow = document.getElementById('ot-arrow-' + i);
+  const btn = arrow.parentElement;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  btn.classList.toggle('open', !isOpen);
+}
+
+buildOutline();
+
+// ===================== PERFORMANCE =====================
+function updatePerf() {
+  const mc = state.mc;
+  const pct = mc.total > 0 ? Math.round(mc.score / mc.total * 100) : 0;
+  document.getElementById('perf-mc-pct').textContent = mc.total > 0 ? pct + '%' : '—';
+  document.getElementById('perf-mc-sub').textContent = mc.score + ' of ' + mc.total;
+  document.getElementById('perf-fc').textContent = state.perf.fcseen;
+  document.getElementById('perf-wp').textContent = state.perf.wpsub;
+  document.getElementById('perf-sessions').textContent = state.perf.sessions;
+
+  const bars = document.getElementById('perf-bars');
+  bars.innerHTML = '';
+  const scores = mc.topicScores;
+  const topics = Object.keys(scores).filter(t => t !== '_timed');
+  if (!topics.length) { bars.innerHTML = '<p style="color:var(--muted);font-size:14px;">Answer some MC questions to see your breakdown here.</p>'; return; }
+  topics.forEach(topic => {
+    const { c, t } = scores[topic];
+    const pct = Math.round(c / t * 100);
+    const color = pct >= 80 ? '#60a860' : pct >= 60 ? '#c8a96e' : '#d46060';
+    bars.innerHTML += `<div class="pb-row"><div class="pb-lbl"><span class="pb-name">${topic}</span><span class="pb-score">${c}/${t} (${pct}%)</span></div><div class="pb-track"><div class="pb-fill" style="width:${pct}%;background:${color};"></div></div></div>`;
+  });
+}
+</script>
+</body>
+</html>
