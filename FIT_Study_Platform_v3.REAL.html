@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>FIT ✨ Ebie's Study Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #fafaf8;
+  --white: #ffffff;
+  --surface: #f5f4f1;
+  --surface2: #eeecea;
+  --border: #e8e5e0;
+  --border2: #d8d4ce;
+  --text: #1a1916;
+  --muted: #8a8680;
+  --muted2: #b8b4ae;
+
+  /* brand colors */
+  --pink: #e8a4b8;
+  --pink-light: #fdf0f4;
+  --pink-mid: #f5d0de;
+  --pink-dark: #c4607a;
+
+  --sage: #8faa8f;
+  --sage-light: #f0f5f0;
+  --sage-mid: #c8dcc8;
+  --sage-dark: #4a6e4a;
+
+  --lavender: #a89ec8;
+  --lavender-light: #f4f2fb;
+  --lavender-mid: #d4ceee;
+  --lavender-dark: #5e5490;
+
+  --peach: #d4956a;
+  --peach-light: #fdf5ef;
+  --peach-mid: #f0d0b8;
+  --peach-dark: #a05c30;
+
+  --gold: #c8a048;
+  --gold-light: #fdf8ec;
+  --gold-mid: #eedda0;
+  --gold-dark: #8c6818;
+
+  --serif: 'Playfair Display', Georgia, serif;
+  --sans: 'DM Sans', system-ui, sans-serif;
+  --mono: 'DM Mono', monospace;
+  --sidebar: 260px;
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; overflow-x: hidden; }
+
+/* ── LAYOUT ── */
+.layout { display: flex; min-height: 100vh; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar);
+  background: var(--white);
+  border-right: 1.5px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 200;
+  transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+}
+.sb-head {
+  padding: 28px 22px 20px;
+  border-bottom: 1.5px solid var(--border);
+}
+.sb-logo {
+  font-family: var(--serif);
+  font-size: 20px;
+  color: var(--text);
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.sb-logo span { color: var(--pink-dark); }
+.sb-sub { font-size: 11px; color: var(--muted); letter-spacing: .04em; }
+.sb-nav { flex: 1; padding: 16px 14px; overflow-y: auto; }
+.nav-label {
+  font-size: 10px; color: var(--muted2); text-transform: uppercase;
+  letter-spacing: .1em; padding: 0 8px; margin: 18px 0 6px;
+  font-weight: 500;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: var(--radius-sm);
+  cursor: pointer; font-size: 13.5px; color: var(--muted);
+  transition: all .15s; border: none; background: none;
+  width: 100%; text-align: left; font-family: var(--sans);
+  font-weight: 400;
+}
+.nav-item:hover { background: var(--surface); color: var(--text); }
+.nav-item.active { background: var(--pink-light); color: var(--pink-dark); font-weight: 500; }
+.nav-icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+.sb-foot { padding: 16px 20px; border-top: 1.5px solid var(--border); }
+.cd-box {
+  background: var(--pink-light);
+  border: 1.5px solid var(--pink-mid);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+.cd-label { font-size: 10px; color: var(--pink-dark); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; font-weight: 500; }
+.cd-val { font-family: var(--mono); font-size: 22px; color: var(--pink-dark); font-weight: 500; }
+.cd-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+/* ── MAIN ── */
+.main { margin-left: var(--sidebar); flex: 1; display: flex; flex-direction: column; }
+
+/* ── TOPBAR ── */
+.topbar {
+  background: var(--white);
+  border-bottom: 1.5px solid var(--border);
+  padding: 16px 32px;
+  display: flex; align-items: center; gap: 14px;
+  position: sticky; top: 0; z-index: 100;
+}
+.menu-btn {
+  display: none; background: none; border: none;
+  color: var(--text); font-size: 20px; cursor: pointer; padding: 2px; flex-shrink: 0;
+}
+.topbar-title { font-family: var(--serif); font-size: 20px; flex: 1; }
+.tb-badge {
+  font-size: 11px; padding: 5px 12px; border-radius: 20px;
+  background: var(--pink-light); color: var(--pink-dark);
+  border: 1.5px solid var(--pink-mid); font-weight: 500;
+}
+
+/* ── CONTENT ── */
+.content { padding: 32px; flex: 1; max-width: 860px; }
+.section { display: none; }
+.section.active { display: block; animation: fadeUp .28s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.pg-title { font-family: var(--serif); font-size: 26px; margin-bottom: 6px; color: var(--text); }
+.pg-desc { font-size: 13.5px; color: var(--muted); margin-bottom: 26px; line-height: 1.65; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 18px;
+}
+.card-pink { background: var(--pink-light); border-color: var(--pink-mid); }
+.card-sage { background: var(--sage-light); border-color: var(--sage-mid); }
+.card-lavender { background: var(--lavender-light); border-color: var(--lavender-mid); }
+.card-peach { background: var(--peach-light); border-color: var(--peach-mid); }
+.card-gold { background: var(--gold-light); border-color: var(--gold-mid); }
+
+.card-sm {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+}
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 14px; margin-bottom: 24px; }
+.stat {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: 18px;
+}
+.stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; font-weight: 500; }
+.stat-val { font-family: var(--serif); font-size: 26px; color: var(--text); margin-bottom: 2px; }
+.stat-sub { font-size: 12px; color: var(--muted); }
+
+/* ── OUTLINE — BIG BUCKETS ── */
+.big-bucket {
+  margin-bottom: 14px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+}
+.bucket-header {
+  width: 100%; padding: 16px 20px;
+  border: none; color: var(--text);
+  font-family: var(--serif); font-size: 17px;
+  text-align: left; cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: background .15s;
+}
+.bucket-header:hover { opacity: .85; }
+.bucket-arrow { font-size: 12px; transition: transform .22s; flex-shrink: 0; margin-left: 10px; }
+.bucket-header.open .bucket-arrow { transform: rotate(90deg); }
+.bucket-body { display: none; background: var(--white); border-top: 1.5px solid var(--border); }
+.bucket-body.open { display: block; }
+
+/* sub-topics inside bucket */
+.sub-topic {
+  border-bottom: 1px solid var(--border);
+}
+.sub-topic:last-child { border-bottom: none; }
+.sub-header {
+  width: 100%; padding: 13px 22px;
+  border: none; background: none;
+  font-family: var(--sans); font-size: 13.5px; font-weight: 500;
+  color: var(--muted); text-align: left; cursor: pointer;
+  display: flex; align-items: center; gap: 10px;
+  transition: all .15s;
+}
+.sub-header:hover { background: var(--surface); color: var(--text); }
+.sub-header.open { color: var(--text); background: var(--surface); }
+.sub-arrow { font-size: 10px; margin-left: auto; transition: transform .2s; }
+.sub-header.open .sub-arrow { transform: rotate(90deg); }
+.sub-body { display: none; }
+.sub-body.open { display: block; }
+
+/* 5-tab structure */
+.part-tabs {
+  display: flex; border-bottom: 1.5px solid var(--border);
+  overflow-x: auto; scrollbar-width: none;
+  background: var(--surface);
+}
+.part-tabs::-webkit-scrollbar { display: none; }
+.part-tab {
+  padding: 10px 18px; font-size: 12px; font-weight: 500;
+  color: var(--muted); cursor: pointer; border: none;
+  background: none; font-family: var(--sans);
+  white-space: nowrap; border-bottom: 2.5px solid transparent;
+  transition: all .15s;
+}
+.part-tab:hover { color: var(--text); }
+.part-tab.active { color: var(--pink-dark); border-bottom-color: var(--pink-dark); background: var(--white); }
+.part-pane { display: none; padding: 22px 24px; }
+.part-pane.active { display: block; }
+
+/* content typography */
+.part-pane h4 {
+  font-size: 11px; font-weight: 500; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .08em;
+  margin: 20px 0 10px; border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+}
+.part-pane h4:first-child { margin-top: 0; }
+.part-pane p { font-size: 13.5px; line-height: 1.8; color: var(--text); margin-bottom: 10px; }
+.part-pane ul { margin: 6px 0 12px 20px; }
+.part-pane ul li { font-size: 13.5px; line-height: 1.8; color: var(--text); margin-bottom: 3px; }
+.part-pane ol { margin: 6px 0 12px 20px; }
+.part-pane ol li { font-size: 13.5px; line-height: 1.8; color: var(--text); margin-bottom: 3px; }
+.part-pane strong { font-weight: 500; color: var(--text); }
+.part-pane em { font-style: italic; color: var(--muted); }
+
+.checklist { list-style: none !important; margin: 0 0 16px 0 !important; }
+.checklist li {
+  font-size: 13.5px; line-height: 1.8; color: var(--text);
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.checklist li:last-child { border-bottom: none; }
+.check-num {
+  font-family: var(--mono); font-size: 10px;
+  color: var(--pink-dark); background: var(--pink-light);
+  padding: 2px 7px; border-radius: 6px;
+  flex-shrink: 0; margin-top: 4px; font-weight: 500;
+  border: 1px solid var(--pink-mid);
+}
+
+.statute-block {
+  background: var(--gold-light); border: 1.5px solid var(--gold-mid);
+  border-radius: var(--radius-sm); padding: 16px 18px; margin-bottom: 14px;
+  font-family: var(--mono); font-size: 12px; line-height: 1.9; color: var(--text);
+}
+.statute-title {
+  font-family: var(--sans); font-size: 12px; font-weight: 500;
+  color: var(--gold-dark); text-transform: uppercase;
+  letter-spacing: .05em; margin-bottom: 10px;
+}
+
+.case-block {
+  background: var(--lavender-light); border: 1.5px solid var(--lavender-mid);
+  border-radius: var(--radius-sm); padding: 16px 18px; margin-bottom: 14px;
+}
+.case-title { font-family: var(--serif); font-size: 15px; color: var(--lavender-dark); margin-bottom: 4px; }
+.case-meta { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+.case-row { display: flex; gap: 10px; margin-bottom: 7px; font-size: 13px; line-height: 1.7; }
+.case-row-label {
+  font-size: 10px; font-weight: 500; color: var(--lavender-dark);
+  text-transform: uppercase; letter-spacing: .04em;
+  min-width: 80px; flex-shrink: 0; padding-top: 3px;
+}
+.ar-note {
+  background: var(--peach-light); border: 1.5px solid var(--peach-mid);
+  border-radius: var(--radius-sm); padding: 12px 14px; margin: 12px 0;
+  font-size: 13px; line-height: 1.7; color: var(--text);
+}
+.ar-note::before { content: '💡 AR: '; font-weight: 500; color: var(--peach-dark); }
+
+.pset-block {
+  background: var(--sage-light); border: 1.5px solid var(--sage-mid);
+  border-radius: var(--radius-sm); padding: 16px 18px; margin-bottom: 14px;
+}
+.pset-q { font-size: 13.5px; font-weight: 500; color: var(--text); line-height: 1.75; margin-bottom: 6px; }
+.pset-sub { font-size: 13px; color: var(--muted); font-style: italic; margin-bottom: 14px; line-height: 1.65; }
+.pset-answer {
+  background: var(--white); border: 1.5px solid var(--sage-mid);
+  border-radius: 8px; padding: 14px; font-size: 13px;
+  line-height: 1.8; color: var(--text); display: none; margin-top: 8px;
+}
+.pset-answer.show { display: block; }
+.pset-toggle {
+  font-size: 12px; color: var(--sage-dark); cursor: pointer;
+  background: none; border: none; font-family: var(--sans);
+  padding: 0; font-weight: 500;
+}
+
+/* ── CHIPS ── */
+.chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 20px; }
+.chip {
+  padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500;
+  cursor: pointer; border: 1.5px solid var(--border);
+  background: var(--white); color: var(--muted); transition: all .15s;
+}
+.chip:hover { color: var(--text); border-color: var(--border2); }
+.chip.active { background: var(--pink-light); color: var(--pink-dark); border-color: var(--pink-mid); }
+
+/* ── FLASHCARD ── */
+.fc-wrap { perspective: 1200px; margin-bottom: 18px; }
+.fc {
+  width: 100%; min-height: 220px; position: relative;
+  transform-style: preserve-3d;
+  transition: transform .5s cubic-bezier(.4,0,.2,1); cursor: pointer;
+}
+.fc.flipped { transform: rotateY(180deg); }
+.fc-face {
+  position: absolute; width: 100%; min-height: 220px;
+  backface-visibility: hidden; border-radius: var(--radius);
+  padding: 30px 32px; display: flex; flex-direction: column;
+  justify-content: center; border: 1.5px solid var(--border);
+}
+.fc-front { background: var(--white); }
+.fc-back {
+  background: var(--lavender-light); border-color: var(--lavender-mid);
+  transform: rotateY(180deg);
+}
+.fc-tag { font-size: 11px; color: var(--muted); margin-bottom: 10px; letter-spacing: .04em; }
+.fc-back .fc-tag { color: var(--lavender-dark); }
+.fc-text { font-size: 16px; line-height: 1.75; color: var(--text); }
+.fc-back .fc-text { color: var(--lavender-dark); font-size: 14px; }
+.fc-hint { font-size: 11px; color: var(--muted2); margin-top: 16px; font-style: italic; }
+.fc-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.fc-ctr { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+
+/* ── BUTTONS ── */
+.btn {
+  padding: 9px 20px; border-radius: var(--radius-sm); font-size: 13px;
+  font-family: var(--sans); font-weight: 500; cursor: pointer;
+  border: 1.5px solid var(--border2); background: var(--white);
+  color: var(--text); transition: all .15s;
+}
+.btn:hover { background: var(--surface); }
+.btn:disabled { opacity: .4; cursor: default; }
+.btn-pink { background: var(--pink-light); border-color: var(--pink-mid); color: var(--pink-dark); }
+.btn-pink:hover { background: var(--pink-mid); }
+.btn-sage { background: var(--sage-light); border-color: var(--sage-mid); color: var(--sage-dark); }
+.btn-lavender { background: var(--lavender-light); border-color: var(--lavender-mid); color: var(--lavender-dark); }
+.btn-danger { background: #fef2f2; border-color: #fecaca; color: #dc2626; }
+
+/* ── MC ── */
+.mc-meta { font-size: 12px; color: var(--muted); font-family: var(--mono); margin-bottom: 10px; }
+.mc-q { font-size: 15px; line-height: 1.7; color: var(--text); margin-bottom: 18px; font-weight: 500; }
+.mc-opts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.mc-opt {
+  padding: 13px 16px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border); background: var(--white);
+  color: var(--text); cursor: pointer; font-size: 13.5px;
+  line-height: 1.5; text-align: left; transition: all .15s;
+  width: 100%; font-family: var(--sans);
+}
+.mc-opt:hover:not(:disabled) { background: var(--surface); border-color: var(--border2); }
+.mc-opt.correct { background: var(--sage-light); border-color: var(--sage-mid); color: var(--sage-dark); }
+.mc-opt.incorrect { background: #fef2f2; border-color: #fecaca; color: #dc2626; }
+.feedback {
+  border-radius: var(--radius-sm); padding: 13px 16px;
+  font-size: 13px; line-height: 1.7; display: none; margin-bottom: 14px;
+}
+.feedback.show { display: block; }
+.feedback.ok { background: var(--sage-light); border: 1.5px solid var(--sage-mid); color: var(--sage-dark); }
+.feedback.bad { background: #fef2f2; border: 1.5px solid #fecaca; color: #dc2626; }
+
+/* ── WORD PROBLEMS ── */
+.wp-ta {
+  width: 100%; min-height: 130px; background: var(--white);
+  border: 1.5px solid var(--border2); border-radius: var(--radius-sm);
+  padding: 14px 16px; font-size: 13.5px; font-family: var(--sans);
+  color: var(--text); resize: vertical; line-height: 1.7; margin-bottom: 12px;
+}
+.wp-ta:focus { outline: none; border-color: var(--pink-dark); }
+.wp-ta::placeholder { color: var(--muted2); }
+.ai-box {
+  background: var(--lavender-light); border: 1.5px solid var(--lavender-mid);
+  border-radius: var(--radius-sm); padding: 16px 18px;
+  margin-top: 14px; display: none;
+}
+.ai-box.show { display: block; }
+.ai-head { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--lavender-dark); margin-bottom: 8px; font-weight: 500; }
+.ai-body { font-size: 13.5px; line-height: 1.8; color: var(--text); }
+.score-badge {
+  display: inline-block; padding: 2px 9px; border-radius: 20px;
+  font-size: 12px; font-weight: 500; font-family: var(--mono); margin-left: 7px;
+}
+.score-hi { background: var(--sage-light); color: var(--sage-dark); border: 1.5px solid var(--sage-mid); }
+.score-mid { background: var(--gold-light); color: var(--gold-dark); border: 1.5px solid var(--gold-mid); }
+.score-lo { background: #fef2f2; color: #dc2626; border: 1.5px solid #fecaca; }
+
+/* ── TIMED EXAM ── */
+.timer { font-family: var(--mono); font-size: 52px; font-weight: 400; color: var(--text); text-align: center; margin: 18px 0; letter-spacing: .03em; }
+.timer.warn { color: var(--peach-dark); }
+.timer.crit { color: #dc2626; }
+.q-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(44px,1fr)); gap: 7px; margin-bottom: 18px; }
+.q-dot {
+  aspect-ratio: 1; border-radius: 8px; border: 1.5px solid var(--border);
+  background: var(--white); display: flex; align-items: center;
+  justify-content: center; font-size: 12px; font-family: var(--mono);
+  color: var(--muted); cursor: pointer; transition: all .15s;
+}
+.q-dot:hover { border-color: var(--pink-mid); color: var(--pink-dark); }
+.q-dot.done { background: var(--sage-light); border-color: var(--sage-mid); color: var(--sage-dark); }
+.q-dot.curr { background: var(--pink-light); border-color: var(--pink-mid); color: var(--pink-dark); }
+
+/* ── SOCRATIC ── */
+.chat-box {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--radius); height: 420px;
+  display: flex; flex-direction: column; overflow: hidden; margin-bottom: 14px;
+}
+.chat-msgs { flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+.chat-msg {
+  max-width: 88%; padding: 12px 16px; border-radius: 14px;
+  font-size: 13.5px; line-height: 1.7;
+  animation: msgIn .22s ease;
+}
+@keyframes msgIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+.msg-prof {
+  background: var(--lavender-light); border: 1.5px solid var(--lavender-mid);
+  align-self: flex-start; border-bottom-left-radius: 4px;
+}
+.msg-prof::before {
+  content: '👨‍🏫 Prof. Raskolnikov';
+  display: block; font-size: 10px; text-transform: uppercase;
+  letter-spacing: .07em; color: var(--lavender-dark);
+  margin-bottom: 5px; font-weight: 500;
+}
+.msg-you {
+  align-self: flex-end; background: var(--pink-light);
+  border: 1.5px solid var(--pink-mid); border-bottom-right-radius: 4px;
+}
+.chat-in-row {
+  border-top: 1.5px solid var(--border); padding: 12px 16px;
+  display: flex; gap: 10px; align-items: flex-end; background: var(--surface);
+}
+.chat-in {
+  flex: 1; background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 10px 14px; font-size: 13.5px;
+  font-family: var(--sans); color: var(--text); resize: none;
+  min-height: 40px; max-height: 90px; line-height: 1.5;
+}
+.chat-in:focus { outline: none; border-color: var(--pink-dark); }
+.chat-in::placeholder { color: var(--muted2); }
+
+/* ── PERFORMANCE ── */
+.pb-row { margin-bottom: 12px; }
+.pb-lbl { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; }
+.pb-track { height: 6px; background: var(--surface); border-radius: 3px; overflow: hidden; border: 1px solid var(--border); }
+.pb-fill { height: 100%; border-radius: 3px; transition: width .8s cubic-bezier(.4,0,.2,1); }
+
+/* ── OVERLAY + SPINNER ── */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 150; }
+.overlay.show { display: block; }
+.spinner {
+  width: 14px; height: 14px; border: 2px solid var(--pink-mid);
+  border-top-color: var(--pink-dark); border-radius: 50%;
+  animation: spin .7s linear infinite; display: inline-block; vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── UTILS ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+.divider { height: 1.5px; background: var(--border); margin: 20px 0; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.spacer { flex: 1; }
+.tag { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+.tag-pink { background: var(--pink-light); color: var(--pink-dark); border: 1px solid var(--pink-mid); }
+.tag-sage { background: var(--sage-light); color: var(--sage-dark); border: 1px solid var(--sage-mid); }
+.tag-lavender { background: var(--lavender-light); color: var(--lavender-dark); border: 1px solid var(--lavender-mid); }
+
+/* ── MOBILE ── */
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .menu-btn { display: block; }
+  .content { padding: 16px; }
+  .topbar { padding: 13px 16px; }
+  .timer { font-size: 36px; }
+  .fc-face { padding: 22px 20px; }
+  .fc-text { font-size: 14px; }
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+  .chat-box { height: 360px; }
+  .part-tab { padding: 9px 13px; font-size: 11px; }
+  .bucket-header { font-size: 15px; }
+  .part-pane { padding: 16px 18px; }
+}
+@media (max-width: 400px) {
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+  .timer { font-size: 30px; }
+}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="layout">
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="sb-head">
+    <div class="sb-logo">Ebie's <span>FIT</span> ✨</div>
+    <div class="sb-sub">Raskolnikov · Columbia Law · Spring 2026</div>
+  </div>
+  <div class="sb-nav">
+    <div class="nav-label">Study</div>
+    <button class="nav-item active" onclick="go('dashboard',this)"><span class="nav-icon">🏠</span> Dashboard</button>
+    <button class="nav-item" onclick="go('outline',this)"><span class="nav-icon">📚</span> Course Outline</button>
+    <div class="nav-label">Practice</div>
+    <button class="nav-item" onclick="go('mc',this)"><span class="nav-icon">✅</span> Multiple Choice</button>
+    <button class="nav-item" onclick="go('wordproblems',this)"><span class="nav-icon">✏️</span> Word Problems</button>
+    <button class="nav-item" onclick="go('flashcards',this)"><span class="nav-icon">🃏</span> Flashcards</button>
+    <button class="nav-item" onclick="go('timed',this)"><span class="nav-icon">⏱️</span> Timed Exam</button>
+    <button class="nav-item" onclick="go('socratic',this)"><span class="nav-icon">🎓</span> Socratic Mode</button>
+    <div class="nav-label">Track</div>
+    <button class="nav-item" onclick="go('performance',this)"><span class="nav-icon">📈</span> Performance</button>
+  </div>
+  <div class="sb-foot">
+    <div class="cd-box">
+      <div class="cd-label">⏰ Exam countdown</div>
+      <div class="cd-val" id="cdval">—</div>
+      <div class="cd-sub">2.5 hrs · open book · no internet</div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+    <div class="topbar-title" id="topbar-title">Dashboard 🏠</div>
+    <span class="tb-badge">FIT · S26 ✨</span>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div id="sec-dashboard" class="section active">
+      <div class="pg-title">Hi Ebie! Let's get to work 💪</div>
+
+      <div class="stat-grid">
+        <div class="stat"><div class="stat-label">📖 Topics</div><div class="stat-val">19</div><div class="stat-sub">assignments covered</div></div>
+        <div class="stat"><div class="stat-label">📝 Part 1</div><div class="stat-val">60m</div><div class="stat-sub">2 word problems</div></div>
+        <div class="stat"><div class="stat-label">🎯 Part 2</div><div class="stat-val">90m</div><div class="stat-sub">15 MC, last 4 weighted</div></div>
+        <div class="stat"><div class="stat-label">⏰ Countdown</div><div class="stat-val" id="cd-dash">—</div><div class="stat-sub">until exam day</div></div>
+      </div>
+
+      <div class="card card-pink">
+        <div style="font-size:12px;color:var(--pink-dark);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;font-weight:500;">🎓 From TA recordings — exam strategy</div>
+        <div style="font-size:13.5px;line-height:1.85;">
+          <p style="margin-bottom:10px;">📌 <strong>Only what Raskolnikov says in class is tested.</strong> If it's in the reading but not said in class, it is not on the exam. If he says "this won't be on the exam," skip it.</p>
+          <p style="margin-bottom:10px;">📌 <strong>Attack outline strategy:</strong> Run through code sections like a checklist. For in-kind benefits: §119 → check → §132 → check → conclusion. One sentence per issue. Cite the code.</p>
+          <p style="margin-bottom:10px;">📌 <strong>Word problems: one sentence per issue.</strong> "This qualifies as X because Y — §Z." That is the level of detail he wants.</p>
+          <p style="margin-bottom:10px;">📌 <strong>MC is substantive, not memory-based.</strong> He is not testing whether you memorized which court said what.</p>
+          <p>📌 <strong>Bring a basic 4-function calculator.</strong> No phones. ~$10. You will need it.</p>
+        </div>
+      </div>
+
+</div><!-- content -->
+</div><!-- main -->
+</div><!-- layout -->
+
+<script>
+// ── OUTLINE DATA ──────────────────────────────────────────────────────────────
+// 5 big buckets: Income, Realization, Deductions, Assignment of Income, Capital Gains
+// Each has sub-topics, each sub-topic has 5 tabs
+
+const BUCKET_COLORS = {
+  'Income': { bg: '#fdf0f4', border: '#f5d0de', text: '#c4607a', emoji: '💰' },
+  'Realization': { bg: '#f4f2fb', border: '#d4ceee', text: '#5e5490', emoji: '⚡' },
+  'Deductions': { bg: '#f0f5f0', border: '#c8dcc8', text: '#4a6e4a', emoji: '📉' },
+  'Assignment of Income': { bg: '#fdf8ec', border: '#eedda0', text: '#8c6818', emoji: '🔀' },
+  'Capital Gains': { bg: '#fdf5ef', border: '#f0d0b8', text: '#a05c30', emoji: '📈' },
+};
+
+const OUTLINE = [
+  {
+    bucket: 'Income',
+    subtopics: [
+      {
+        title: 'General Concepts',
+        tabs: {
+          rules: `<h4>Controlling Rule / Checklist</h4>
+<ul class="checklist">
+  <li><span class="check-num">1</span>Start with <strong>§61</strong>: "Gross income means all income from whatever source derived." Non-exhaustive list.</li>
+  <li><span class="check-num">2</span><strong>Treas. Reg. §1.61-1(a)</strong>: "Gross income includes income realized in any form, whether in money, property, or services."</li>
+  <li><span class="check-num">3</span><strong>Treas. Reg. §1.61-2(d)</strong>: Pay for a service in property → FMV of property must be included in income as compensation.</li>
+  <li><span class="check-num">4</span>If someone satisfies your obligation — pays your rent or taxes — that payment is income to you. <em>Old Colony Trust.</em></li>
+  <li><span class="check-num">5</span>Economic substance doctrine: What matters is not the form of income but the fact that the taxpayer received an economic benefit.</li>
+  <li><span class="check-num">6</span>Haig-Simons baseline: Income = Consumption + Change in Net Worth. Starting point only — the Code does not follow it exactly.</li>
+</ul>`,
+          notes: `<h4>General Notes</h4>
+<p><strong>Taxable Income Formula:</strong> Taxable Income = Gross Income (§61) – [Group of Deductions]</p>
+<p><strong>Goals of the tax system (Raskolnikov):</strong></p>
+<ol>
+  <li><strong>Redistribution</strong> — To reduce economic inequality by taking from people with more money and redistributing to people with less. Historical note: 300 years ago the poor paid more than the rich. "Long gone."</li>
+  <li><strong>Funding public goods</strong> — Non-exclusive + non-rival (e.g., lighthouse). Free-rider problem. Once government provides costly things → must raise funds → taxes.</li>
+  <li><strong>Government promotion of social policy (generous view) / political views (skeptical view)</strong> — In US politics, easier to pass tax cuts than spending increases. Example: IRA ("basically nothing to do with inflation"). Major environmental legislation almost entirely through tax code.</li>
+  <li><strong>To pay off America's debt.</strong></li>
+</ol>
+<p><strong>Haig-Simons definition:</strong> I = C + ΔS. If you exclude savings from tax, you end up just taxing consumption. Far broader definition than has ever been implemented exactly. Taxpayers prefer consumption tax: savings deducted and tax can be paid later (deferred).</p>
+<p><strong>Other taxes in NY (example from class):</strong> Federal marginal rate ~35; Medicare 1.45%; ACA surtax 0.9%; NY State ~6.85%; NYC ~3.82%. Combined marginal rate ~48% for first-year biglaw associate. "$40k bonus → ~half left after tax."</p>
+<p><strong>Borrowing is not income. Why?</strong> You receive cash. You incur equal repayment obligation. Present value of obligation ≈ amount borrowed. Net worth unchanged.</p>
+<p><strong>Tax deferred is tax reduced.</strong> Important to remember throughout the course.</p>
+<div class="ar-note">This is an introductory class. The first time a concept is introduced, he goes slow. By deductions, it is "just law" because almost all concepts are already familiar.</div>`,
+          statutes: `<div class="statute-block"><div class="statute-title">§61 — Gross Income Defined</div>(a) General definition. Except as otherwise provided in this subtitle, gross income means all income from whatever source derived, including (but not limited to) the following items: (1) Compensation for services, including fees, commissions, fringe benefits, and similar items; (2) Gross income derived from business; (3) Gains derived from dealings in property; (4) Interest; (5) Rents; (6) Royalties; (7) Dividends; (8) Alimony and separate maintenance payments; (9) Annuities; (10) Income from life insurance and endowment contracts; (11) Pensions; (12) Income from discharge of indebtedness; (13) Distributive share of partnership gross income; (14) Income in respect of a decedent; (15) Income from an interest in an estate or trust.</div>
+<div class="statute-block"><div class="statute-title">Treas. Reg. §1.61-1(a) — Gross Income</div>Gross income includes income realized in any form, whether in money, property, or services. Income may be realized, therefore, in the form of services, meals, accommodations, stock, or other property, as well as in cash.</div>
+<div class="statute-block"><div class="statute-title">Treas. Reg. §1.61-2(d) — Compensation Paid Other Than in Cash</div>If services are paid for in property, the fair market value of the property taken in payment must be included in income as compensation.</div>`,
+          cases: `<div class="case-block">
+<div class="case-title">Old Colony Trust Co. v. Commissioner</div>
+<div class="case-meta">U.S. Supreme Court</div>
+<div class="case-row"><span class="case-row-label">Facts</span><span>Employer paid the income taxes owed by its employees on their compensation.</span></div>
+<div class="case-row"><span class="case-row-label">Rule</span><span>Payment of an employee's tax liability by the employer constitutes additional income to the employee. If someone satisfies your obligation, that payment is income to you.</span></div>
+<div class="case-row"><span class="case-row-label">Significance</span><span>Income can be realized even when you don't directly receive cash — economic benefit controls over form.</span></div>
+</div>
+<div class="case-block">
+<div class="case-title">Commissioner v. Glenshaw Glass Co.</div>
+<div class="case-meta">U.S. Supreme Court — Broad definition of income</div>
+<div class="case-row"><span class="case-row-label">Rule</span><span>"Accessions to wealth, clearly realized, and over which the taxpayers have complete dominion" are taxable income — even when not the product of capital, labor, or both combined. This is the broad, modern definition of income under §61.</span></div>
+<div class="case-row"><span class="case-row-label">Contrast</span><span><em>Eisner v. Macomber</em> (narrow): "gain derived from capital, from labor or from both" — excluded windfalls. Overridden by Glenshaw Glass.</span></div>
+</div>`,
+          practice: `<div class="pset-block">
+<div class="pset-q">Q1 (PSET 1). Taxpayer A wins $10,000 in a lottery. Is this gross income under §61?</div>
+<button class="pset-toggle" onclick="toggleAns(this)">Show answer ▾</button>
+<div class="pset-answer">Yes. Under §61, gross income means "all income from whatever source derived." Lottery winnings are accessions to wealth, clearly realized, over which taxpayer has complete dominion. Glenshaw Glass. Taxable as ordinary income.</div>
+</div>
+<div class="pset-block">
+<div class="pset-q">Q2 (PSET 1). Taxpayer B borrows $50,000 from a bank. Is this gross income?</div>
+<button class="pset-toggle" onclick="toggleAns(this)">Show answer ▾</button>
+<div class="pset-answer">No. Borrowing is not income because the taxpayer incurs an equal and offsetting repayment obligation. Net worth is unchanged. No accession to wealth. No income under §61.</div>
+</div>
+<div class="pset-block">
+<div class="pset-q">Q3 (PSET 1). Taxpayer C's employer pays C's federal income tax liability of $8,000 directly to the IRS. Does C have income?</div>
+<button class="pset-toggle" onclick="toggleAns(this)">Show answer ▾</button>
+<div class="pset-answer">Yes. Under Old Colony Trust, payment of a taxpayer's obligation by a third party (here, the employer) is income to the taxpayer. C has $8,000 of additional gross income under §61(a)(1) as compensation. The form of payment (direct to IRS vs. to C) does not change the economic reality.</div>
+</div>`
+        }
+      },
+      {
+        title: 'In-Kind Benefits',
+        tabs: {
+          rules: `<h4>Controlling Rule / Attack Checklist</h4>
+<p><strong>General rule:</strong> Economic substance — income realized in any form (money, property, or services). Treas. Reg. §1.61-1(a).</p>
+<p><strong>§119 — Meals (ALL 3 required):</strong></p>
+<ul class="checklist">
+  <li><span class="check-num">1</span>Furnished to employee or their spouse/dependents by or on behalf of employer</li>
+  <li><span class="check-num">2</span>For the convenience of the employer</li>
+  <li><span class="check-num">3</span>On business premises of employer</li>
+</ul>
+<p><strong>§119 — Lodging (ALL 4 required):</strong></p>
+<ul class="checklist">
+  <li><span class="check-num">1</span>Furnished to employee or their spouse/dependents</li>
+  <li><span class="check-num">2</span>For the convenience of the employer</li>
+  <li><span class="check-num">3</span>On business premises of employer</li>
+  <li><span class="check-num">4</span>As a condition of employment</li>
+</ul>
+<p><strong>§119(b)(1):</strong> Terms of employment contract or state statute are NOT determinative of whether meals/lodging are for the convenience of the employer.</p>
+<p><strong>§132 Fringe Benefit categories:</strong></p>
+<ul class="checklist">
+  <li><span class="check-num">§132(a)(1)</span>No-additional-cost services — same line of business; employer incurs no substantial additional cost including forgone revenue</li>
+  <li><span class="check-num">§132(a)(2)</span>Qualified employee discounts — on property/services offered to customers; discount on property cannot exceed gross profit %; on services, cannot exceed 20%</li>
+  <li><span class="check-num">§132(a)(3)</span>Working condition fringes — would be deductible as §162 business expense if employee paid</li>
+  <li><span class="check-num">§132(a)(4)</span>De minimis fringes — so small accounting for them would be unreasonable or impracticable. <strong>Cash is NEVER de minimis.</strong></li>
+  <li><span class="check-num">§132(a)(5)</span>Qualified transportation fringe</li>
+  <li><span class="check-num">§132(a)(8)</span>Retirement planning services</li>
+</ul>
+<p><strong>First question in any fringe benefit problem (from class):</strong> Is this a fringe benefit at all, or just part of doing the job? (E.g., professor's office, CEO taking company jet to a meeting, firm giving you a bluebook — just part of the job, §132 doesn't apply.)</p>`,
+          notes: `<h4>General Notes</h4>
+<p><strong>Rationale of convenience of employer doctrine (Benaglia):</strong> When an employee has no real choice but to accept the benefit — effectively "on call" — the benefit is for the employer's benefit, not compensation to the employee.</p>
+<p><strong>Why does §119(b)(1) exclude state statutes?</strong> States are major employers and could be incentivized to avoid taxation. States are very willing to play tax games with federal income tax. Employee and employer are both incentivized to write "for the convenience of the employer" into every contract — so the provision of the contract is not determinative.</p>
+<p><strong>Ways to tax in-kind benefits (from class — three options, all problematic):</strong></p>
+<ol>
+  <li><strong>Tax based on FMV</strong> — Problem: too high, forced consumption. People may not choose these benefits for themselves.</li>
+  <li><strong>Tax based on cost to employer</strong> — Problem: irrelevant to the employee's enrichment.</li>
+  <li><strong>Tax based on rental value to the employee</strong> — Problem: hard to value, varies by individual.</li>
+</ol>
+<p><strong>Gross-up formula:</strong> PT = AT / (1 − T), where PT = pre-tax amount, AT = after-tax amount, T = marginal tax rate.</p>
+<p><strong>§132 line-of-business requirement:</strong> No-additional-cost service (§132(a)(1)) must be in the same line of business. Yankees hypo from class: baseball employee can use empty Yankees seat (same line of business, no additional cost, no forgone revenue), but cannot get airline ticket — different line of business.</p>
+<div class="ar-note">Meal reimbursement $ ≠ meal "furnished" by the employer. Commissioner v. Kowalski. Cash meal allowance is not excludable under §119 even if employee uses it to buy meals. BUT if occasional, could qualify as de minimis fringe under §132(e).</div>`,
+          statutes: `<div class="statute-block"><div class="statute-title">§119(a) — Meals and Lodging Furnished for the Convenience of the Employer</div>There shall be excluded from gross income of an employee the value of any meals or lodging furnished to him, his spouse, or any of his dependents by or on behalf of his employer for the convenience of the employer, but only if—
+(1) in the case of meals, the meals are furnished on the business premises of the employer, or
+(2) in the case of lodging, the employee is required to accept such lodging on the business premises of his employer as a condition of his employment.
+(b)(1) Provisions of employment contract or State statute not to be determinative. In determining whether meals or lodging are furnished for the convenience of the employer, the provisions of an employment contract or of a State statute fixing terms of employment shall not be determinative of whether the meals or lodging are intended as compensation.
+(b)(2) The fact that a charge is made for such meals, and the fact that the employee may accept or decline such meals, shall not be taken into account.</div>
+<div class="statute-block"><div class="statute-title">§132(a) — Fringe Benefits Excludable from Gross Income</div>Gross income shall not include any fringe benefit which qualifies as a—
+(1) no-additional-cost service,
+(2) qualified employee discount,
+(3) working condition fringe,
+(4) de minimis fringe,
+(5) qualified transportation fringe,
+(6) qualified moving expense reimbursement,
+(7) qualified retirement planning services.
+(e) De minimis fringe — any property or service the value of which is (after taking into account the frequency with which similar fringes are provided) so small as to make accounting for it unreasonable or administratively impracticable.</div>`,
+          cases: `<div class="case-block">
+<div class="case-title">Benaglia v. Commissioner</div>
+<div class="case-meta">Tax Court — Foundational §119 / Convenience of Employer</div>
+<div class="case-row"><span class="case-row-label">Facts</span><span>Manager of hotels in Hawaii. He and his wife lived in a hotel suite, received free meals. Hotel required this — he had to be available at all times.</span></div>
+<div class="case-row"><span class="case-row-label">Holding</span><span>Meals and lodging excluded. For convenience of employer, not compensation. Received as a necessary incident of performing his duties.</span></div>
+<div class="case-row"><span class="case-row-label">Significance</span><span>Foundation of "convenience of the employer" doctrine, later codified in §119. Common law test from Benaglia: only need to satisfy convenience of the employer (§119 adds on-premises and condition-of-employment requirements).</span></div>
+</div>
+<div class="case-block">
+<div class="case-title">Commissioner v. Kowalski</div>
+<div class="case-meta">U.S. Supreme Court — Cash meal allowances not excludable</div>
+<div class="case-row"><span class="case-row-label">Facts</span><span>NJ state police received cash meal allowances on top of wages. State statute characterized them as non-compensatory.</span></div>
+<div class="case-row"><span class="case-row-label">Holding</span><span>Cash meal allowances are not "meals furnished" within §119. Income under §61. §119(b)(1) makes the state statute characterization irrelevant.</span></div>
+<div class="case-row"><span class="case-row-label">Rule</span><span>Meal reimbursement $ ≠ meal "furnished" by employer. "Furnished" requires actual provision of the meal, not cash equivalent.</span></div>
+</div>`,
+          practice: `<div class="pset-block">
+<div class="pset-q">Kara, a state police officer, is on duty 8am–4pm. Her employment contract requires her to remain on duty during her lunch hour. The police department reimburses her for lunch expenses, up to $15/day. A state statute says meals are a condition of the job and not part of compensation. Is she taxed on the reimbursement?</div>
+<button class="pset-toggle" onclick="toggleAns(this)">Show answer ▾</button>
+<div class="pset-answer">§119 does not apply. (1) Meals were not "furnished" by employer — cash reimbursement ≠ "furnished." §119(a); Kowalski. (2) Meals were not furnished "on the business premises." §119(a)(1). (3) State statute saying meals are a condition of the job is not determinative. §119(b)(1). Result: reimbursement is included in gross income under §61. The state statute characterization is irrelevant.</div>
+</div>
+<div class="pset-block">
+<div class="pset-q">Alex manages the Rustic Inn. He and his family live in an adjoining house on the premises. The motel phone/doorbell rings in the house so he can answer calls at all hours. Most similar motels require on-premises managers. Alex's accommodations are nicer than comparable managers receive. Does Alex have gross income from the lodging?</div>
+<button class="pset-toggle" onclick="toggleAns(this)">Show answer ▾</button>
+<div class="pset-answer">§119 likely applies — lodging excluded. (1) Furnished to employee and spouse/dependents — yes. (2) For convenience of employer — yes; Alex must be on call at all hours. (3) On business premises — yes; house is on the motel property. (4) As condition of employment — arguably yes. The relative quality of the accommodation is irrelevant to §119 analysis. Under Benaglia: same result — for convenience of employer. If house were a mile down the road: §119 fails — "on business premises" fails. Benaglia probably also fails.</div>
+</div>
+<div class="pset-block">
+<div class="pset-q">Beth's meals from her law firm were determined not excludable under §119 or §132. Meals worth $2,500. Beth's marginal tax rate is 25%. The firm wants to make her whole on the taxes. How much will the firm pay Beth?</div>
+<button class="pset-toggle" onclick="toggleAns(this)">Show answer ▾</button>
+<div class="pset-answer">Use gross-up formula. PT = AT / (1−T) = $2,500 / (1 − 0.25) = $2,500 / 0.75 = $3,333.33. The firm pays Beth $3,333.33.</div>
+</div>`
+        }
+      },
+      {
+        title: 'Gifts & Bequests',
+        tabs: {
+          rules: `<h4>Controlling Rule / Checklist</h4>
+<ul class="checklist">
+  <li><span class="check-num">⚠️</span>Always analyze BOTH sides: (a) Is it income to the donee? (b) Is there a deduction to the donor?</li>
+  <li><span class="check-num">1</span>Check <strong>§102(c)</strong> FIRST: Transfer from employer to employee? → categorically NOT a gift. Income. End analysis.</li>
+  <li><span class="check-num">2</span>Check <strong>§274(b)</strong>: Did donor take a business deduction over $25? → not a gift.</li>
+  <li><span class="check-num">3</span>If neither resolves → apply <strong>Duberstein</strong>: Was the transfer made from "detached and disinterested generosity"? Focus on transferor's intent. Trier of fact decides. Deferential review.</li>
+  <li><span class="check-num">4</span><strong>§102(a)</strong>: Gross income does NOT include value of property acquired by gift, bequest, devise, or inheritance.</li>
+  <li><span class="check-num">5</span><strong>Surrogate taxation</strong>: Donor taxed instead of donee — by denial of deduction.</li>
+  <li><span class="check-num">6</span><strong>§1015</strong>: Donee takes donor's adjusted basis (carryover basis). Taxed on ALL appreciation — pre-gift and post-gift — upon sale.</li>
+  <li><span class="check-num">7</span><strong>§1015 exception — depreciated property</strong>: If FMV at gift < donor's basis → for determining LOSS ONLY, basis = FMV at time of gift. In between = no gain and no loss.</li>
+  <li><span class="check-num">8</span><strong>§1014 — Bequests</strong>: Basis = FMV at date of death. Pre-death appreciation permanently FORGIVEN. Not just deferred — forgiven. Step-up in basis.</li>
+</ul>`,
+          notes: `<h4>General Notes</h4>
+<p><strong>Gifts as exception to Haig-Simons:</strong> Under Haig-Simons, gifts increase recipient's ability to pay → income. Yet §102 excludes them. Gifts are a tax preference.</p>
+<p><strong>The double taxation problem:</strong> There is only one act of consumption — the son who receives the gift consumes it. Taxing both father (when he earns) AND son (when he receives) → two levels of tax on one act of consumption. The law avoids this.</p>
+<p><strong>Why surrogate taxation for gifts (Raskolnikov's three reasons):</strong></p>
+<ol>
+  <li><strong>Non-interference with personal relationships</strong> — Taxing gifts directly would require government to monitor family relationships. The law avoids "barging into the family."</li>
+  <li><strong>Forced consumption concerns</strong> — Recipient may not want the gift (e.g., unwanted vase). Taxing receipt could force unwanted tax liability.</li>
+  <li><strong>Bracket arbitrage and revenue loss</strong> — Gifts flow from higher-bracket donors to lower-bracket donees. If donor deductions were allowed: Donor saves at high rate, donee pays at low rate, government loses revenue. Example: Father saves $2,000; son pays $500; government loses $1,500.</li>
+</ol>
+<p><strong>Deductions vs. Credits:</strong> Deductions subtract from income — regressive ("upside-down subsidies," benefit wealthy more). Credits subtract from tax owed — same dollar benefit regardless of bracket, more progressive. Refundable credits (EITC, CTC) most progressive.</p>
+<p><strong>Duberstein — bad facts (NOT a gift):</strong> Past services rendered; expectation of future services; legal or moral obligation; business deduction taken by donor; quid pro quo, even implicit; cash payments.</p>
+<p><strong>Duberstein — good facts (gift):</strong> Personal, non-fungible gifts; no quid pro quo; no legal or moral obligation; donor does not take deduction.</p>
+<p><strong>Loophole:</strong> Business setting + not employer-employee + transferor doesn't care about deduction (e.g., tax-exempt entity) → no deduction lost, exclusion for transferee, looks like a gift → no tax on either side. Nonprofits, trade unions, churches (Stanton!).</p>
+<p><strong>Principle of conservation of basis:</strong> Income and no cash → basis goes up. Deduction and don't pay cash → basis goes down. No income and no deduction → basis doesn't change.</p>
+<div class="ar-note">Carryover basis is favorable to taxpayers — gifts usually go from higher to lower bracket → less overall revenue for government. Built-in gain can permanently disappear if donee holds until death → §1014 step-up.</div>`,
+          statutes: `<div class="statute-block"><div class="statute-title">§102 — Gifts and Inheritances</div>(a) General rule. Gross income does not include the value of property acquired by gift, bequest, devise, or inheritance.
+(b) Income. Subsection (a) shall not exclude from gross income—
+(1) the income from any property referred to in subsection (a); or
+(2) where the gift, bequest, devise, or inheritance is of income from property, the amount of such income.
+(c) Employee gifts. (1) In general. Subsection (a) shall not exclude from gross income any amount transferred by or for an employer to, or for the benefit of, an employee.</div>
+<div class="statute-block"><div class="statute-title">§274(b) — Business Gift Deduction Limitation</div>No deduction shall be allowed under section 162 or section 212 for any expense for gifts made directly or indirectly to any individual to the extent that such expense, when added to prior expenses of the taxpayer for gifts made to such individual during the same taxable year, exceeds $25.</div>
+<div class="statute-block"><div class="statute-title">§1015 — Basis of Property Acquired by Gifts</div>(a) If the property was acquired by gift after December 31, 1920, the basis shall be the same as it would be in the hands of the donor or the last preceding owner by whom it was not acquired by gift, except that if such basis is greater than the fair market value of the property at the time of the gift, then for the purpose of determining loss the basis shall be such fair market value.</div>
+<div class="statute-block"><div class="statute-title">§1014 — Basis of Property Acquired from a Decedent</div>(a) In general. The basis of property in the hands of a person acquiring the property from a decedent shall be the fair market value of the property at the date of the decedent's death.</div>`,
+          cases: `<div class="case-block">
+<div class="case-title">Commissioner v. Duberstein & Stanton v. United States</div>
+<div class="case-meta">U.S. Supreme Court (1960) — Consolidated</div>
+<div class="case-row"><span class="case-row-label">Duberstein Facts</span><span>Duberstein provided business leads to Berman. Berman sent him a Cadillac to thank him. Duberstein didn't need it (already had two cars). Berman deducted value as business expense. Duberstein did not include in gross income.</span></div>
+<div class="case-row"><span class="case-row-label">Proc. History</span><span>Tax Court (NOT gift) → 6th Circuit (reversed, gift) → SCOTUS (reversed 6th Circuit, back to Tax Court: NOT a gift).</span></div>
+<div class="case-row"><span class="case-row-label">Stanton Facts</span><span>Stanton retired from Trinity Church as comptroller. Upon separation, they paid him approximately an extra year's salary. Trial judge: gift. 2nd Circuit: reversed. SCOTUS: reversed 2nd Circuit, remanded for new findings of fact (findings too conclusory). On remand: EDNY found gift, 2nd Circuit affirmed (not clearly erroneous).</span></div>
+<div class="case-row"><span class="case-row-label">Rule</span><span>A gift proceeds from "detached and disinterested generosity" out of "affection, respect, admiration, charity or like impulses." Critical inquiry: INTENT OF THE DONOR (transferor), not transferee. Trier of fact decides. Appellate review: "clearly erroneous" standard — highly deferential.</span></div>
+<div class="case-row"><span class="case-row-label">Gov't Arguments (Rejected)</span><span>SCOTUS rejected all three bright-line rules: (1) No gifts in employment relationships; (2) No gifts when donor takes business deduction; (3) Corporations cannot make gifts.</span></div>
+<div class="case-row"><span class="case-row-label">Congress Response</span><span>§102(c) (1986): employer-to-employee transfers categorically not gifts (would mandate opposite result in Stanton). §274(b) (1962): business gift deductions capped at $25. Loophole: neither applies to tax-exempt entities — exactly like Stanton!</span></div>
+</div>
+<div class="case-block">
+<div class="case-title">Taft v. Bowers</div>
+<div class="case-meta">U.S. Supreme Court (1929) — Carryover basis is constitutional</div>
+<div class="case-row"><span class="case-row-label">Facts</span><span>A purchased 100 shares of stock for $1,000. Gave to B when FMV = $2,000. B sold for $5,000. Government taxed B on full $4,000. B argued only $3,000 (post-gift appreciation) was "her income" under the 16th Amendment.</span></div>
+<div class="case-row"><span class="case-row-label">Holding</span><span>Carryover basis is constitutional. Nothing in the Constitution limits taxable gain to appreciation that occurred only while property was in the possession of the recipient. Had donor sold, he would have shared the profit with the government — donee merely steps into donor's shoes.</span></div>
+</div>`,
+          practice: `<div class="pset-block">
+<div class="pset-q">Alex is a customer at a restaurant. He gives the waiter a $20 tip at the end of his meal. The waiter performs no services for Alex beyond serving his meal. Alex argues the tip is a gift. Is the tip gross income to the waiter?</div>
+<button class="pset-toggle" onclick="toggleAns(this)">Show answer ▾</button>
+<div class="pset-answer">Income, though likely unenforced. Alex could argue under Duberstein: tip made out of detached and disinterested generosity; not employer-employee, so §102(c) does not apply. Government argues: this is payment for past services rendered, even if donor got no additional economic benefit. Duberstein — compensation for services. Answer: Income. Practically unenforced.</div>
+</div>
+<div class="pset-block">
+<div class="pset-q">A (basis $1,000) gifts stock to B when FMV = $5,000. B later sells for $8,000. What is B's gain?</div>
+<button class="pset-toggle" onclick="toggleAns(this)">Show answer ▾</button>
+<div class="pset-answer">Under §1015, B takes A's carryover basis of $1,000. Gain = $8,000 − $1,000 = $7,000. Taft v. Bowers: constitutionally permissible. B is taxed on entire appreciation — pre-gift ($4,000) and post-gift ($3,000).</div>
+</div>`
+        }
+      },
+      {
+        title: 'Discharge of Indebtedness',
+        tabs: {
+          rules: `<h4>Controlling Rule / Checklist</h4>
+<ul class="checklist">
+  <li><span class="check-num">1</span>General rule: <strong>§61(a)(12)</strong> — discharge of indebtedness income included in gross income.</li>
+  <li><span class="check-num">Key</span>CODI only arises when the <strong>lender is not repaid in full</strong>. If a third party pays the debt in full, the lender is whole → NO COD income (instead: compensation or gift income to taxpayer).</li>
+  <li><span class="check-num">2</span>CODI does not require default. Can arise from voluntary economic repricing of debt.</li>
+  <li><span class="check-num">3</span>Check <strong>§108 exclusions</strong> (in order): (A) bankruptcy/title 11; (B) insolvency — excluded only to the extent of insolvency; (C) qualified farm indebtedness; (D) qualified real property business indebtedness; (E) qualified principal residence indebtedness.</li>
+  <li><span class="check-num">4</span><strong>§108(b) — trade-off</strong>: Excluded COD → must reduce tax attributes in order: NOLs first → capital loss carryovers → basis. Tax DEFERRED, not forgiven.</li>
+  <li><span class="check-num">5</span><strong>§108(e)(5) — Purchase money debt reduction</strong>: Solvent debtor + debt to seller + debt arose out of purchase of property + would otherwise be CODI → treated as purchase price reduction, NOT COD income → reduced basis instead. Reason for adjustment doesn't matter. Applies only to PROPERTY, not services.</li>
+  <li><span class="check-num">6</span><strong>Contested liability doctrine</strong>: If bona fide dispute over amount owed, subsequent settlement treated as actual amount of debt. Excess of original debt over settlement = NOT CODI. Applies to both property AND services.</li>
+</ul>`,
+          notes: `<h4>General Notes</h4>
+<p><strong>Why borrowing creates COD income potential:</strong> Borrow $100 → get cash, no income (offsetting obligation). Take deduction. Later refuse to repay → expectation of repayment collapses → discharge of indebtedness income. §61 includes COD income. Debt allows temporary tax exemption — deduction now, inclusion later — but timing matters.</p>
+<p><strong>Key lesson from class hypos:</strong> CODI is only when the lender is not repaid in full. This makes a difference for some taxes (like social security).</p>
+<p><strong>Davis Polk hypos (from class):</strong></p>
+<ul>
+  <li>Hypo 1: Davis Polk lends you $5K, then cancels the debt → CODI. Lender not repaid in full. Also NOT a gift under §102(c) since employer to employee.</li>
+  <li>Hypo 2: Davis Polk guarantees your loan from Citibank, then repays Citibank → NO CODI. Citi was repaid in full. But you still have income: $5K of compensation income. Old Colony: payment on my behalf to someone else is income to me.</li>
+</ul>
+<p><strong>In-class COD hypos (bond/interest rate changes):</strong> Corporation issues bonds at $100. Interest rates rise → bond now worth $96 in secondary market. Corporation buys back at $96 → $4 COD income. Rule: when interest rates go up, bond values go down. Buybacks at discount produce COD income.</p>
+<p><strong>§108(e)(5) — fridge hypo from class:</strong> Buy fridge at Walmart for $500 on credit. Problems with fridge. Walmart agrees to accept $400. NOT CODI → purchase price adjustment → reduced basis. Even if Walmart lowers price because Fed raised rates and you want to pay early → still not CODI under §108(e)(5). Reason for adjustment doesn't matter.</p>
+<p><strong>Contested liability doctrine — painting hypo:</strong> Hire painter for $5K. They do a bad job. Parties settle for $4K. NOT CODI (even though §108(e)(5) doesn't apply to services) → contested liability doctrine: parties never agreed on the amount owed for a subpar job → settlement fixes the true liability. Contrast: painter doing great job but you want out because Fed raised rates → pay $4K to relieve $5K debt → YES CODI because §108(e)(5) doesn't apply and no genuine dispute.</p>
+<div class="ar-note">Insolvency exception (§108(a)(B)): If bankrupt, and you have $100 stock with $100 basis, and potential CODI of $30. Under §108(a), no income (bankruptcy). But basis reduction on stock. §108(b)(2)(E). If you survive bankruptcy, sell later → more gain from basis reduction. Tax is deferred, not forgiven. Equity: bankrupt person is worse off → fairness supports exception. Efficiency: people won't choose to go bankrupt. Administrability: easy to establish bankruptcy (title 11 proceeding).</div>`,
+          statutes: `<div class="statute-block"><div class="statute-title">§108(a) — Exclusion from Gross Income</div>(1) In general. Gross income does not include any amount which (but for this subsection) would be includible in gross income by reason of the discharge (in whole or in part) of indebtedness of the taxpayer if—
+(A) the discharge occurs in a title 11 case,
+(B) the discharge occurs when the taxpayer is insolvent,
+(C) the indebtedness discharged is qualified farm indebtedness,
+(D) in the case of a taxpayer other than a C corporation, the indebtedness discharged is qualified real property business indebtedness, or
+(E) the indebtedness discharged is qualified principal residence indebtedness which is discharged before January 1, 2026.
+(b)(1) Reduction of tax attributes. The amount excluded from gross income under subparagraph (A), (B), or (C) shall be applied to reduce the tax attributes of the taxpayer as provided in paragraph (2).
+(b)(2) Tax attributes affected in order: (A) NOL. Any net operating loss for the taxable year of the discharge. (D) Capital loss carryovers. Any net capital loss for the taxable year of the discharge. (E) Basis reduction — the basis of the property of the taxpayer.
+(d)(3) Insolvent means the excess of liabilities over the fair market value of assets, determined immediately before the discharge.</div>
+<div class="statute-block"><div class="statute-title">§108(e)(5) — Purchase Money Debt Reduction</div>If the debt of a purchaser of property to the seller of such property is reduced, such reduction shall not be treated as income from discharge of indebtedness if—
+(A) the reduction would be treated as income from discharge of indebtedness but for this paragraph,
+(B) the debtor is solvent at the time of the reduction, and
+(C) the debt was incurred by the purchaser to acquire the property.
+In such case, the amount of the reduction shall be treated as a purchase price adjustment.</div>`,
+          cases: `<div class="case-block">
+<div class="case-title">United States v. Kirby Lumber Co.</div>
+<div class="case-meta">U.S. Supreme Court — Foundational COD income case</div>
+<div class="case-row"><span class="case-row-label">Facts</span><span>Kirby Lumber issued bonds at par. Later, in the same year, bought them back at a discount in the open market.</span></div>
+<div class="case-row"><span class="case-row-label">Holding</span><span>The difference between the par value (amount issued) and the repurchase price is income — discharge of indebtedness income. The company freed itself from an obligation at less than face amount. Accession to wealth.</span></div>
+<div class="case-row"><span class="case-row-label">Rule</span><span>When a debtor extinguishes its own debt for less than the face amount, the difference is COD income includable under §61(a)(12).</span></div>
+</div>
+<div class="case-block">
+<div class="case-title">Zarin v. Commissioner</div>
+<div class="case-meta">3d Circuit — Contested liability doctrine / gambling chips</div>
+<div class="case-row"><span class="case-row-label">Facts</span><span>Zarin gambled on credit at Resorts casino in Atlantic City. Accumulated $3.4M in gambling debts. Casino was not legally permitted to extend him credit under NJ gaming regulations. Settled for $500K.</span></div>
+<div class="case-row"><span class="case-row-label">Holding</span><span>No COD income. Narrow holding: gambling chips had no independent economic value and the debt was unenforceable under state law.</span></div>
+<div class="case-row"><span class="case-row-label">WARNING</span><span>DO NOT APPLY THIS CASE on the exam. Very narrow holding about gambling chips. The TA sessions specifically flag this. Use the contested liability doctrine separately for genuine disputes over amount owed.</span></div>
+</div>`,
+          practice: `<div class="pset-block">
+<div class="pset-q">The summer before you start working for Davis Polk, you borrow $5K from them (an advance). They agree to withdraw it from your paychecks. When you start, a partner calls and says they won't subtract it from your income. Do you have COD income?</div>
+<button class="pset-toggle" onclick="toggleAns(this)">Show answer ▾</button>
+<div class="pset-answer">Yes — CODI under §61(a)(12). Davis Polk canceled the debt. They accepted nothing in full repayment. Lender not repaid in full. Also NOT a gift under §102(c) — employer to employee transfers are categorically not gifts. COD income of $5,000 included in gross income.</div>
+</div>
+<div class="pset-block">
+<div class="pset-q">Now assume Davis Polk guarantees loans from Citibank to law students and takes care of the debt with Citi by repaying Citi directly. Do you have COD income?</div>
+<button class="pset-toggle" onclick="toggleAns(this)">Show answer ▾</button>
+<div class="pset-answer">No COD income. Citibank (the lender) was repaid in full. Lender was not shorted. No discharge of indebtedness. But you DO have income: $5,000 of compensation income. Under Old Colony Trust, payments made on your behalf to a third party are income to you. The type of income differs — compensation, not CODI — which matters for some taxes (e.g., social security).</div>
+</div>`
+        }
+      }
+    ]
+  },
+  {
+    bucket: 'Realization',
+    subtopics: [
+      {
+        title: 'Origins, Special Cases & Modern Approach',
+        tabs: {
+          rules: `<h4>Controlling Rule / Checklist</h4>
+<ul class="checklist">
+  <li><span class="check-num">1</span>Gain/loss NOT taken into account until a <strong>realization event</strong> occurs. Statutory choice, NOT a constitutional requirement. Bruun.</li>
+  <li><span class="check-num">2</span><strong>§1001(a)</strong>: Gain = Amount Realized − Adjusted Basis. Loss = Adjusted Basis − Amount Realized.</li>
+  <li><span class="check-num">3</span><strong>Treas. Reg. §1.1001-1</strong>: Gain/loss realized from conversion of property to cash, OR exchange of property for property "differing materially either in kind or in extent."</li>
+  <li><span class="check-num">4</span><strong>Cottage Savings "hair-trigger" test</strong>: Exchange is a realization event if properties embody <em>legally distinct entitlements</em>. Economic equivalence is IRRELEVANT. Same legal entitlements (e.g., two shares of same IBM stock) = no realization.</li>
+  <li><span class="check-num">5</span><strong>Rev. Rul. 90-109</strong>: Change in the <em>fundamental substance</em> of a contract = material difference = realization. Even without an exchange.</li>
+  <li><span class="check-num">6</span><strong>Taxpayer's choice</strong>: Want to realize losses → use Cottage Savings (modify legal entitlements). Want to avoid realizing gains → rely on 90-109 + preamble (argue change is not in fundamental substance). Government cannot win either argument.</li>
+  <li><span class="check-num">7</span><strong>§7701(o) — Economic Substance Doctrine</strong>: (A) meaningful non-tax change in economic position AND (B) substantial non-tax purpose. CONJUNCTIVE. Only applies when doctrine is "relevant" — undefined. No appellate decision after 16+ years. 40% penalty under §6662(i) for non-economic transactions.</li>
+  <li><span class="check-num">8</span><strong>§1041</strong>: No gain/loss on transfers between spouses or former spouses incident to divorce. Transferee takes transferor's adjusted basis (carryover). Tax deferred, not forgiven.</li>
+  <li><span class="check-num">9</span><strong>Woodsam</strong>: Nonrecourse loan in excess of adjusted basis is NOT a realization event. Not a "sale or other disposition" under §1001.</li>
+  <li><span class="check-num">10</span><strong>§109 & §1019</strong>: Legislatively overrule Bruun. §109: deferral — tax on building improvement occurs upon disposition, not when reverts to landlord.</li>
+</ul>`,
+          notes: `<h4>General Notes</h4>
+<p><strong>Why the realization requirement exists:</strong></p>
+<ol>
+  <li><strong>Liquidity</strong> — No cash to pay tax on paper gains. Forced to sell to pay tax would be harsh.</li>
+  <li><strong>Administrability</strong> — No need to value assets annually. Especially difficult for illiquid assets.</li>
+  <li><strong>Political practicality</strong> — Marking unrealized gains to market would be deeply unpopular.</li>
+</ol>
+<p><strong>Macomber vs. Bruun — the backwards results (from class):</strong> Macomber: appreciated stock, easy to value, easy to liquidate → SCOTUS said NOT realized. Should have been realized. Bruun: tenant walked away during Depression, property likely worth less → SCOTUS said realized. Should NOT have been realized. Both cases came out backwards relative to what makes sense.</p>
+<p><strong>Cottage Savings — SNL crisis context:</strong> S&Ls held fixed-rate mortgages that declined in value as interest rates rose. They couldn't sell without recording losses (regulatory problem). FHLBB issued Memo R-49 allowing exchanges of "substantially identical" mortgage pools. SCOTUS: legally distinct entitlements → realization → tax-deductible losses. SNLs got bailed out twice: (1) tax refunds from losses; (2) going bankrupt and congressional bailout.</p>
+<p><strong>Cottage Savings vs. 90-109 — the taxpayer's game:</strong> Before Cottage Savings: government's position = fundamental substance test (90-109). Cottage Savings blew things up — any change in legal provisions = realization event. Government issued 30 pages of regulations (preamble to §1.1001-3) saying: for debt instrument modifications, looking at fundamental substance, not legal entitlements. But Cottage Savings still applies to non-debt contracts. Taxpayer chooses which test to use.</p>
+<p><strong>US v. Davis (SCOTUS 1962):</strong> Pre-§1041. Transfer of appreciated property in divorce = taxable realization event. §1041 legislatively overruled Davis.</p>
+<p><strong>Farid-Es-Sultaneh v. Commissioner (2d Cir. 1947):</strong> Property transferred in exchange for giving up marital rights = sale, not gift. Transferee gets FMV basis (bargained-for exchange, not a gift).</p>
+<div class="ar-note">Cottage Savings is hugely problematic — allows aggressive tax reduction while doing nothing. The legal entitlements test is easier to satisfy than economic substance, doesn't require added liquidity, doesn't make valuation any easier. Taxpayers still choose timing based on whether they want gains or losses. §7701(o) would have both prongs fail for Cottage Savings — but §7701(o) likely doesn't apply because of the "relevant" limitation.</div>`,
+          statutes: `<div class="statute-block"><div class="statute-title">§1001 — Determination of Amount of and Recognition of Gain or Loss</div>(a) Gain = Amount Realized − Adjusted Basis. Loss = Adjusted Basis − Amount Realized.
+(b) Amount realized = sum of any money received plus the FMV of the property (other than money) received.
+(c) Except as otherwise provided in this subtitle, the entire amount of the gain or loss on the sale or exchange of property shall be recognized.</div>
+<div class="statute-block"><div class="statute-title">Treas. Reg. §1.1001-1 — Gain or Loss from Disposition of Property</div>Except as otherwise provided in Subtitle A, the gain or loss realized from the conversion of property into cash, or from the exchange of property for other property differing materially either in kind or in extent, is treated as income or as loss sustained. The amount realized is the sum of any money received plus the FMV of any property (other than money) received.</div>
+<div class="statute-block"><div class="statute-title">§1041 — Transfers of Property Between Spouses or Incident to Divorce</div>(a) No gain or loss shall be recognized on a transfer of property from an individual to (1) a spouse, or (2) a former spouse, but only if the transfer is incident to the divorce.
+(b) The property shall be treated as acquired by the transferee by gift, and the basis of the transferee shall be the adjusted basis of the transferor.
+(c) Incident to divorce = occurs within 1 year after the date on which the marriage ceases, or is related to the cessation of the marriage.</div>
+<div class="statute-block"><div class="statute-title">§7701(o) — Economic Substance Doctrine</div>(1) A transaction has economic substance only if—
+(A) the transaction changes in a meaningful way (apart from Federal income tax effects) the taxpayer's economic position, AND
+(B) the taxpayer has a substantial purpose (apart from Federal income tax effects) for entering into such transaction.
+(4) Achieving a financial accounting benefit shall not be taken into account as a purpose if the origin of such benefit is a reduction of Federal income tax.
+(5)(C) The determination of whether the economic substance doctrine is relevant shall be made in the same manner as if this subsection had never been enacted.</div>`,
+          cases: `<div class="case-block">
+<div class="case-title">Eisner v. Macomber</div>
+<div class="case-meta">U.S. Supreme Court (1920) — Narrow holding; still good law</div>
+<div class="case-row"><span class="case-row-label">Facts</span><span>Standard Oil declared a pro-rata stock dividend on common stock.</span></div>
+<div class="case-row"><span class="case-row-label">Holding</span><span>Stock dividend NOT income. No realization. "Gain derived from capital" requires something of exchangeable value proceeding from the property, severed from the capital.</span></div>
+<div class="case-row"><span class="case-row-label">Legacy</span><span>Realization is no longer a constitutional requirement (overruled in principle by Bruun). But specific narrow holding — pro-rata stock dividends on common stock are not income — still good law. Codified in §305(a).</span></div>
+</div>
+<div class="case-block">
+<div class="case-title">Helvering v. Bruun</div>
+<div class="case-meta">U.S. Supreme Court (1940) — Overruled by §§109 and 1019</div>
+<div class="case-row"><span class="case-row-label">Facts</span><span>1915: Bruun leases property 99 years. 1929: Old building torn down; tenant builds new building. 1933: Lessee abandons lease (Depression, property worthless to lessee). Government taxes Bruun on gain from building reversion.</span></div>
+<div class="case-row"><span class="case-row-label">Holding</span><span>Gain realized when taxpayer repossessed the land with new building. Not necessary that gain be severed from capital or received in cash.</span></div>
+<div class="case-row"><span class="case-row-label">Significance</span><span>Realization is NOT a constitutional requirement — it is a matter of Congressional discretion. Court does not even mention Macomber — implicitly dismisses its reasoning without explicitly overruling. §§109 and 1019 legislatively overrule the result.</span></div>
+</div>
+<div class="case-block">
+<div class="case-title">Woodsam Associates, Inc. v. Commissioner</div>
+<div class="case-meta">2d Circuit (1952)</div>
+<div class="case-row"><span class="case-row-label">Rule</span><span>A nonrecourse loan in excess of adjusted basis is NOT a realization event. Not a "sale or other disposition" under §1001.</span></div>
+<div class="case-row"><span class="case-row-label">Policy</span><span>Enables "buy, borrow, die" strategy — borrow against appreciated property, get cash tax-free, hold until death, basis steps up to FMV under §1014, appreciation permanently escapes income tax.</span></div>
+</div>
+<div class="case-block">
+<div class="case-title">Commissioner v. Cottage Savings Association</div>
+<div class="case-meta">U.S. Supreme Court (1991) — "Hair-trigger" realization</div>
+<div class="case-row"><span class="case-row-label">Facts</span><span>S&Ls exchanged mortgage pools. Same economic value, but secured by different homes and owed by different obligors. FHLBB Memo R-49 said these were "substantially identical" — acceptable for accounting purposes but exchange allowed for tax purposes.</span></div>
+<div class="case-row"><span class="case-row-label">Holding</span><span>Yes, realization. Properties are "materially different" because they embody legally distinct entitlements. Economic equivalence irrelevant.</span></div>
+<div class="case-row"><span class="case-row-label">Rule</span><span>Material difference = legally distinct entitlements. NOT economic difference. Two shares of same IBM = legally identical = no realization. Different mortgage interests = legally distinct = realization.</span></div>
+<div class="case-row"><span class="case-row-label">AR Note</span><span>Court is disagreeing with IRS's interpretation of its OWN regulation. Decision created "worst of all worlds" for government. Taxpayer chooses: Cottage Savings for losses; 90-109/preamble to avoid realizing gains. Cottage Savings would flunk both prongs of §7701(o) — but §7701(o) likely doesn't apply because of "relevant" limitation.</span></div>
+</div>`,
+          practice: `<div class="pset-block">
+<div class="pset-q">You have a share of IBM. Your classmate has a share of IBM from a different time (different basis). You exchange shares. Under Cottage Savings, is there a realization event?</div>
+<button class="pset-toggle" onclick="toggleAns(this)">Show answer ▾</button>
+<div class="pset-answer">No realization. Cottage Savings: material difference = legally distinct entitlements. Two shares of IBM are legally IDENTICAL entitlements — same rights, same obligations, same issuer. The different basis is irrelevant. Legal entitlements, not economic characteristics, control. No realization event.</div>
+</div>
+<div class="pset-block">
+<div class="pset-q">A corporation changes the insured under a corporate-owned life insurance policy from a departed employee to a new one. Under Rev. Rul. 90-109, is there a realization event?</div>
+<button class="pset-toggle" onclick="toggleAns(this)">Show answer ▾</button>
+<div class="pset-answer">Yes, realization. Under Rev. Rul. 90-109: a change in the fundamental substance of a contract constitutes a "material difference" → realization, even without a sale or exchange. Changing the insured fundamentally changes what the contract is about — the life insured is the core of a life insurance policy. This is a change in fundamental substance → realization.</div>
+</div>`
+        }
+      }
+    ]
+  },
+  {
+    bucket: 'Deductions',
+    subtopics: [
+      {
+        title: 'General Concepts, Personal, Business vs. Personal, Current vs. Deferred',
+        tabs: {
+          rules: `<h4>Controlling Rule / Checklist</h4>
+<p><strong>Three key deduction questions (from class):</strong></p>
+<ul class="checklist">
+  <li><span class="check-num">1</span>Is this personal or business? → §162 (business) vs. §262 (personal, not deductible)</li>
+  <li><span class="check-num">2</span>Is this trade/business or investment? → §162 vs. §212 (investment expenses)</li>
+  <li><span class="check-num">3</span>Is this current or deferred? → §162 (deduct now) vs. §263 (capitalize → recover via depreciation §167/168)</li>
+</ul>
+<p><strong>Above-the-line deductions (§62):</strong> Subtracted from gross income to get AGI. Available to all taxpayers without itemizing. Include trade/business expenses, self-employment taxes, alimony (pre-2019), certain IRA contributions, student loan interest.</p>
+<p><strong>Below-the-line deductions:</strong> Itemized deductions subtracted from AGI only if they exceed the standard deduction.</p>
+<p><strong>Key personal deductions (§§213, 163, 164, 170, 165):</strong></p>
+<ul class="checklist">
+  <li><span class="check-num">§213</span>Medical expenses exceeding 7.5% of AGI. Qualified medical care only — NOT cosmetic surgery, personal care, lodging, payments to relatives.</li>
+  <li><span class="check-num">§163</span>Interest: Qualified residence interest (acquisition debt ≤ $750K), investment interest, trade or business interest. TOB interest → ATL; investment interest → BTL.</li>
+  <li><span class="check-num">§164</span>SALT: State/local income, property taxes — CAPPED at $10,000 (§164(b)(6), TCJA).</li>
+  <li><span class="check-num">§170</span>Charitable contributions — subject to AGI limits.</li>
+  <li><span class="check-num">§262</span>Personal/living/family expenses — NOT deductible. Consumption is not deductible.</li>
+</ul>
+<p><strong>Current vs. Deferred:</strong> §162 (current, ordinary and necessary, trade or business, deduct in year incurred). §263 (capitalize — cost with benefit extending substantially beyond tax year → add to basis → recover through depreciation). §§167/168 MACRS: Modified Accelerated Cost Recovery System. §179: immediate expensing of certain business assets.</p>`,
+          notes: `<h4>General Notes</h4>
+<p><strong>§262 — why personal expenses are not deductible:</strong> Consumption is not deductible. If we start deducting consumption, we end up with a tax on savings. Doesn't reflect ability to pay.</p>
+<p><strong>Deductions are "upside-down subsidies":</strong> Value = amount × marginal rate. Same $5,000 deduction: 40% bracket taxpayer benefits much more; 10% bracket taxpayer benefits much less. Republicans like deductions, Democrats like credits.</p>
+<p><strong>Medical expense deduction line-drawing (from class):</strong></p>
+<ul>
+  <li><em>Taylor</em>: lawn mowing not deductible as medical care (even if doctor prescribed exercise)</li>
+  <li><em>Ochs</em>: private school tuition — cannot deduct when another party is the primary beneficiary of the alleged medical expenses</li>
+  <li>Other non-deductibles: lodging (generally), cosmetic surgeries, payments to relatives</li>
+</ul>
+<p><strong>Business vs. Personal — three key distinctions:</strong></p>
+<ol>
+  <li><strong>Is there a trade or business?</strong> §280A (home office: exclusive + regular use as principal place of business; self-employed = ATL). §183 hobby losses: must have profit motive. Nickerson factors.</li>
+  <li><strong>Is there a business connection?</strong> Commuting = personal (§262). Clothing = personal unless required AND not adaptable for general use. Education = deductible if maintains/improves existing skills; NOT deductible if qualifies for new career.</li>
+  <li><strong>Current or deferred?</strong> Encyclopedia Britannica case: development costs for long-lived assets must be capitalized.</li>
+</ol>
+<div class="ar-note">The basic principle of §162 vs. §263: ordinary business expenses (rent, salaries, supplies) → deduct now. Capital expenditures (building, machinery, intangibles) → capitalize and depreciate. The key question is whether the expenditure has benefits that extend substantially beyond the taxable year.</div>`,
+          statutes: `<div class="statute-block"><div class="statute-title">§162 — Trade or Business Expenses</div>(a) In general. There shall be allowed as a deduction all the ordinary and necessary expenses paid or incurred during the taxable year in carrying on any trade or business, including—
+(1) a reasonable allowance for salaries or other compensation for personal services actually rendered;
+(2) traveling expenses (including amounts expended for meals and lodging other than amounts which are lavish or extravagant under the circumstances) while away from home in the pursuit of a trade or business; and
+(3) rentals or other payments required to be made as a condition to the continued use or possession, for purposes of the trade or business, of property to which the taxpayer has not taken or is not taking title or in which he has no equity.</div>
+<div class="statute-block"><div class="statute-title">§262 — Personal, Living, and Family Expenses</div>Except as otherwise expressly provided in this chapter, no deduction shall be allowed for personal, living, or family expenses.</div>
+<div class="statute-block"><div class="statute-title">§213 — Medical, Dental, etc., Expenses</div>(a) Allowance of deduction. There shall be allowed as a deduction the expenses paid during the taxable year, not compensated for by insurance or otherwise, for medical care of the taxpayer, his spouse, or a dependent, to the extent that such expenses exceed 7.5 percent of adjusted gross income.</div>
+<div class="statute-block"><div class="statute-title">§263 — Capital Expenditures</div>(a) General rule. No deduction shall be allowed under section 162 or 212 for—
+(1) any amount paid out for new buildings or for permanent improvements or betterments made to increase the value of any property or estate; or
+(2) any amount expended in restoring property or in making good the exhaustion thereof for which an allowance is or has been made.</div>`,
+          cases: `<div class="case-block">
+<div class="case-title">Welch v. Helvering</div>
+<div class="case-meta">U.S. Supreme Court — "Ordinary and necessary"</div>
+<div class="case-row"><span class="case-row-label">Facts</span><span>Taxpayer voluntarily paid debts of a bankrupt corporation to preserve his business reputation and restore customer relationships.</span></div>
+<div class="case-row"><span class="case-row-label">Holding</span><span>Payments were capital expenditures, not ordinary business expenses. "Ordinary" means normal or habitual to the particular business. Paying another's debts is not ordinary.</span></div>
+<div class="case-row"><span class="case-row-label">Rule</span><span>"Ordinary" under §162 means common and accepted in the particular type of business, not that it must happen frequently. Distinction between current expense and capital expenditure.</span></div>
+</div>
+<div class="case-block">
+<div class="case-title">Commissioner v. Nickerson</div>
+<div class="case-meta">Hobby vs. trade or business — §183</div>
+<div class="case-row"><span class="case-row-label">Rule</span><span>For an activity to be a trade or business under §162 (not a hobby under §183), the taxpayer must be engaged with a primary purpose of making a profit. Relevant factors: regularity, businesslike manner, expertise, time and effort, history of income, amount of occasional profits, financial status, elements of personal pleasure.</span></div>
+</div>`,
+          practice: `<div class="pset-block">
+<div class="pset-q">Dan is a criminal defense attorney. He pays $8,000/year for membership at an exclusive golf club. He uses the club primarily for personal relaxation on weekends, but occasionally brings clients there. Can he deduct the full $8,000 under §162?</div>
+<button class="pset-toggle" onclick="toggleAns(this)">Show answer ▾</button>
+<div class="pset-answer">No. §162 allows ordinary and necessary business expenses. §262 disallows personal expenses. §274(a)(1)(B): club dues for entertainment facilities — organized for entertainment purposes — are non-deductible even if some business use. Dan cannot deduct the $8,000.</div>
+</div>
+<div class="pset-block">
+<div class="pset-q">Linda is a freelance writer. She has a dedicated room in her apartment (200 sq ft out of 1,000 sq ft total). She pays $24,000/year in rent. She uses the room exclusively and regularly for her writing business. Can she deduct home office expenses? How much?</div>
+<button class="pset-toggle" onclick="toggleAns(this)">Show answer ▾</button>
+<div class="pset-answer">Yes. Under §280A, a self-employed person may deduct home office expenses if the space is used exclusively and regularly as the principal place of business. Linda qualifies. Deductible rent = 200/1,000 × $24,000 = $4,800. The deduction is above-the-line for self-employed under §62(a)(1).</div>
+</div>`
+        }
+      }
+    ]
+  },
+  {
+    bucket: 'Assignment of Income',
+    subtopics: [
+      {
+        title: 'Assignment of Income',
+        tabs: {
+          rules: `<h4>Controlling Rule / Checklist</h4>
+<ul class="checklist">
+  <li><span class="check-num">1</span><strong>Lucas v. Earl</strong>: Income taxed to the person who EARNS it. Cannot assign wages/services income to someone else to shift the tax. "The fruit cannot be attributed to a different tree from which it grew."</li>
+  <li><span class="check-num">2</span>Services income → ALWAYS taxed to the earner, regardless of who it is paid to.</li>
+  <li><span class="check-num">3</span><strong>Blair v. Commissioner</strong>: Donating an income interest in a trust = gift of a PROPERTY RIGHT. Income from that interest is taxable to the assignee. Distinguishable from earned income.</li>
+  <li><span class="check-num">4</span>Key distinction: If you actually transfer the property right itself (not just the right to receive income from property you still own) → income can follow the property. (Blair.) If you assign wages or the right to income from property you retain → taxed to you. (Lucas v. Earl.)</li>
+  <li><span class="check-num">5</span><strong>Anticipatory assignment of already-accrued income</strong>: Cannot shift the tax burden by assigning income that has already accrued to you.</li>
+</ul>`,
+          notes: `<h4>General Notes</h4>
+<p><strong>Lucas v. Earl — the fruit and tree metaphor:</strong> The person who earns the income (the "tree") is taxed on it, regardless of where the "fruit" goes. You cannot contract away tax liability on income you earn.</p>
+<p><strong>Why this matters:</strong> Without the assignment of income doctrine, high-bracket taxpayers could assign income to family members in lower brackets → eliminates the progressive tax system.</p>
+<p><strong>Blair distinction:</strong> Blair did not assign the right to income — he assigned the underlying property interest (a beneficial interest in a trust). The trust income then naturally flowed to the assignee as the owner of that interest. This is like giving away the tree itself, not just the fruit.</p>
+<p><strong>How to distinguish Lucas v. Earl from Blair:</strong></p>
+<ul>
+  <li>Services income (wages, fees) → always taxed to earner. (Lucas.)</li>
+  <li>Transfer of property right that generates income → income can follow to transferee. (Blair.) But: anticipatory assignment of accrued income from property you still retain → taxed to you.</li>
+</ul>
+<p><strong>Horst rule (from class — preview):</strong> Taxpayer who assigns the right to receive interest (detaches a coupon from a bond before maturity and transfers it) realizes income when the coupon is paid. The assignor, not the assignee, is taxed — because the economic gain occurred during the assignor's holding period.</p>`,
+          statutes: `<div class="statute-block"><div class="statute-title">§61(a)(1) — Compensation for Services</div>Gross income means all income from whatever source derived, including compensation for services, including fees, commissions, fringe benefits, and similar items. No exception for compensation that is assigned or redirected to another person before receipt.</div>`,
+          cases: `<div class="case-block">
+<div class="case-title">Lucas v. Earl</div>
+<div class="case-meta">U.S. Supreme Court (1930) — Services income taxed to earner</div>
+<div class="case-row"><span class="case-row-label">Facts</span><span>Mr. Earl contracted with his wife in 1901 that all property they earned or acquired would be jointly owned. Earl earned legal fees and salary. He argued half the income should be taxed to his wife under the contract.</span></div>
+<div class="case-row"><span class="case-row-label">Holding</span><span>All of Earl's income taxed to him. The contract with his wife does not shift the tax liability. "The fruits cannot be attributed to a different tree from which they grew."</span></div>
+<div class="case-row"><span class="case-row-label">Rule</span><span>Income from services is taxed to the person who earned it. Anticipatory assignment of earned income does not shift the tax. The earner of the income is the taxpayer, regardless of contractual arrangements.</span></div>
+</div>
+<div class="case-block">
+<div class="case-title">Blair v. Commissioner</div>
+<div class="case-meta">U.S. Supreme Court — Property income follows the property</div>
+<div class="case-row"><span class="case-row-label">Facts</span><span>Taxpayer assigned to his children his beneficial interest in a trust (right to receive income from the trust corpus during his lifetime). The trust subsequently distributed income to the children.</span></div>
+<div class="case-row"><span class="case-row-label">Holding</span><span>The children, not Blair, are taxed on the income. Blair transferred a property right — a beneficial interest in the trust — not merely the right to receive income. The income naturally flowed to the owners of the property interest.</span></div>
+<div class="case-row"><span class="case-row-label">Distinction from Lucas</span><span>"Since the gift was deemed to be a gift of the property, the income from it was held to be the income of the owner of the property, who was the donee... clearly inapplicable to gifts of interest or wages." The "tree" (the trust interest) itself was transferred.</span></div>
+</div>`,
+          practice: `<div class="pset-block">
+<div class="pset-q">Frank, a surgeon, earns $500,000 annually. He assigns 20% of his future surgical fees to a family trust for his children's benefit. The hospital pays the trust directly. Who is taxed on the surgical income?</div>
+<button class="pset-toggle" onclick="toggleAns(this)">Show answer ▾</button>
+<div class="pset-answer">Frank is taxed on 100% of his surgical fees. Under Lucas v. Earl, income from services is taxed to the person who earns it — the "tree" cannot be separated from its "fruit." Frank's surgical fees are earned by his personal services. No matter how he directs payment, the income is taxable to Frank. The assignment to the trust does not shift the tax obligation. Frank must include $500,000 in his gross income.</div>
+</div>
+<div class="pset-block">
+<div class="pset-q">Tara owns rental property and assigns 5 years' worth of future rent (currently worth $50,000) to her daughter as a gift. The daughter collects $10,000 in year 1. Who is taxed?</div>
+<button class="pset-toggle" onclick="toggleAns(this)">Show answer ▾</button>
+<div class="pset-answer">Tara is taxed on the rent income. Anticipatory assignment of already-accrued income from property she retains cannot shift the tax burden. Contrast with Blair: Tara did not transfer the rental property itself — she only assigned the right to receive income from property she still owns. Under Lucas v. Earl principle: the earner/owner is taxed. To shift the income tax, Tara would need to actually transfer the rental property to her daughter (Blair).</div>
+</div>`
+        }
+      }
+    ]
+  },
+  {
+    bucket: 'Capital Gains',
+    subtopics: [
+      {
+        title: 'Overview & Business Hedging',
+        tabs: {
+          rules: `<h4>Controlling Rule / Checklist</h4>
+<ul class="checklist">
+  <li><span class="check-num">1</span>Net capital gains taxed at preferential rates (0%/15%/20%) rather than ordinary rates (up to 37%). Must be a "capital asset" held >12 months (long-term).</li>
+  <li><span class="check-num">2</span><strong>§1221(a)(1)</strong>: Property held primarily for sale to customers in the ordinary course of business is NOT a capital asset → ordinary income. Key distinction: investor vs. dealer.</li>
+  <li><span class="check-num">3</span>Net capital loss: May offset capital gains + up to $3,000 of ordinary income (§1211(b)). Capital losses only deductible against capital gains, except for the $3,000.</li>
+  <li><span class="check-num">4</span><strong>Business hedging exception</strong>: Hedging transactions entered in the normal course of business and identified as hedges → ordinary treatment under Treas. Reg. §1.1221-2. Policy: ordinary treatment for hedges ensures risk-management costs are ordinary deductions matching ordinary income.</li>
+  <li><span class="check-num">5</span><strong>Arkansas Best</strong>: Stock purchased to protect business operations is still a capital asset. Motive for buying does not change character of what is purchased.</li>
+</ul>`,
+          notes: `<h4>General Notes</h4>
+<p><strong>Policy rationales for preferential capital gains rates (Raskolnikov is skeptical of all of them):</strong></p>
+<ol>
+  <li><strong>Bunching</strong> — Capital gains often accrue over many years. If taxed as ordinary income in year of sale, could subject the gain to the maximum rate even though it might have been taxed at lower rates if realized ratably. Problem: under current rate structure, most individuals realizing substantial capital gains are already at the maximum rate at all relevant times.</li>
+  <li><strong>Lock-in</strong> — Tax on capital gains may induce people to hold assets when they might otherwise sell and reinvest. §1014 step-up at death eliminates tax liability on gain if held until death. People think reduction in tax rate would increase revenue by increasing number of investors who sell. Problem: unclear.</li>
+  <li><strong>Inflation</strong> — Unfair to tax gain from inflation vs. real gain. Problem: provides relief where inflation has little impact and fails in others. Alternative: index basis for inflation — but complex. So Congress uses a preferential rate.</li>
+  <li><strong>General incentive to save and invest.</strong> Problem: may increase other taxes which reduce economic growth. Saving means less consumption today.</li>
+</ol>
+<p><strong>Capital gain = excise tax (from class):</strong> Capital gains tax effectively operates as an excise tax because the nominal tax rate stays constant once the long-term holding period is satisfied. Annual effective tax rate goes down the longer you hold → encourages long holding periods.</p>
+<p><strong>"Primarily for sale to customers" analysis:</strong> Courts look at: frequency and continuity of sales, segregation of property, extent of development activity, advertising, maintenance of office, whether held as investment or for sale. Dealer = ordinary income. Investor = capital gain.</p>`,
+          statutes: `<div class="statute-block"><div class="statute-title">§1221 — Capital Asset Defined</div>(a) In general. For purposes of this subtitle, the term "capital asset" means property held by the taxpayer (whether or not connected with his trade or business), but does not include—
+(1) stock in trade of the taxpayer or other property of a kind which would properly be included in the inventory of the taxpayer if on hand at the close of the taxable year, or property held by the taxpayer primarily for sale to customers in the ordinary course of his trade or business;
+(2) property, used in his trade or business, of a character which is subject to the allowance for depreciation provided in section 167, or real property used in his trade or business;
+(3) a copyright, a literary, musical, or artistic composition [in hands of creator]...</div>
+<div class="statute-block"><div class="statute-title">§1211(b) — Limitation on Capital Losses (Individuals)</div>In the case of a taxpayer other than a corporation, losses from sales or exchanges of capital assets shall be allowed only to the extent of the gains from such sales or exchanges, plus (if such losses exceed such gains) whichever of the following is smallest: (1) the taxable income for the taxable year; (2) $3,000 ($1,500 in the case of a married individual filing a separate return).</div>`,
+          cases: `<div class="case-block">
+<div class="case-title">Arkansas Best Corporation v. Commissioner</div>
+<div class="case-meta">U.S. Supreme Court (1988) — Business motive does not change capital asset character</div>
+<div class="case-row"><span class="case-row-label">Facts</span><span>Arkansas Best purchased stock in a bank to protect its business reputation (the bank was in financial difficulty and threatened to harm Arkansas Best's business if it failed). Stock later became worthless.</span></div>
+<div class="case-row"><span class="case-row-label">Holding</span><span>The stock loss is a capital loss, not an ordinary loss. The stock was a capital asset. The business motive for purchasing the stock does not change the character of what was purchased.</span></div>
+<div class="case-row"><span class="case-row-label">Rule</span><span>§1221 defines capital assets by what the property IS, not why it was purchased. The motive test is not incorporated into §1221. If a taxpayer holds property that falls within §1221's definition, it is a capital asset regardless of the motive for acquiring it.</span></div>
+</div>`,
+          practice: `<div class="pset-block">
+<div class="pset-q">Elena is a real estate investor who buys distressed homes, renovates them, and sells them quickly — typically within 6 months. She has sold 20 homes this year. She claims long-term capital gains treatment because real estate is §1221 "property." Is she entitled to capital gains treatment?</div>
+<button class="pset-toggle" onclick="toggleAns(this)">Show answer ▾</button>
+<div class="pset-answer">No. Under §1221(a)(1), property held "primarily for sale to customers in the ordinary course of a trade or business" is excluded from the definition of "capital asset." Elena's pattern — volume of sales (20 homes in one year), quick turnaround (6 months), active renovation — strongly suggests she is a dealer, not an investor. Courts look at frequency, continuity, and purpose. Elena likely has ordinary income, not capital gains.</div>
+</div>
+<div class="pset-block">
+<div class="pset-q">Nick held stock for 18 months before selling at a $20,000 gain. He also sold a painting held for 8 months at a $5,000 gain. His ordinary income tax rate is 32%. What is the tax treatment of each gain?</div>
+<button class="pset-toggle" onclick="toggleAns(this)">Show answer ▾</button>
+<div class="pset-answer">Stock (18 months): long-term capital asset (held >12 months, not dealer property). Taxed at preferential long-term capital gains rates (0%, 15%, or 20% depending on income). Painting (8 months): short-term capital gain — held less than 12 months → taxed as ordinary income at Nick's 32% rate. Short-term capital gains are NOT entitled to preferential rates; they are taxed as ordinary income.</div>
+</div>`
+        }
+      }
+    ]
+  }
+];
+
+// ── MC QUESTIONS ──────────────────────────────────────────────────────────────
+const MC = [
+  {topic:'In-Kind Benefits', q:'Kara is a state police officer. Her employment contract requires her to remain on duty during her lunch hour. The police department reimburses her for lunch expenses up to $15/day. A state statute says meals are a condition of the job and not compensation. Under §119, is the reimbursement excluded from Kara\'s income?', opts:['Yes — the state statute establishes it is a condition of employment','Yes — meals are for the convenience of the employer','No — cash reimbursement is not meals "furnished" by the employer; §119 does not apply','No — police officers are excluded from §119 coverage'], correct:2, exp:'§119 requires meals be "furnished" by the employer. Under Kowalski, a cash meal allowance (reimbursement) is not "furnished." Additionally, §119(b)(1) expressly provides that provisions of an employment contract or state statute are not determinative. Income under §61.'},
+  {topic:'In-Kind Benefits', q:'Under §132(a)(1), which is required for a benefit to qualify as a "no-additional-cost service"?', opts:['The service must be available to all customers at a discounted rate','The employer must incur no substantial additional cost, including forgone revenue, in providing the service to the employee','The employee must use the service only for business purposes','The service must be worth less than $100'], correct:1, exp:'§132(a)(1) requires: (1) service offered for sale to customers in the ordinary course of the employer\'s LINE OF BUSINESS in which the employee performs services, AND (2) employer incurs no substantial additional cost (including forgone revenue) in providing such service to the employee.'},
+  {topic:'In-Kind Benefits', q:'A Yankees employee is given a free seat at a Yankees game after the game started (an otherwise empty seat). Is this excludable under §132(a)(1)?', opts:['No — all employer benefits must be pre-approved','Yes — no additional cost to employer, same line of business','Yes — all sports tickets are de minimis fringes','No — the Yankees cannot give benefits to employees'], correct:1, exp:'§132(a)(1): service offered in the ordinary course of the same line of business in which employee performs services; employer incurs no substantial additional cost (including forgone revenue — the seat was empty). Both requirements met. The seat is excludable.'},
+  {topic:'Gifts & Bequests', q:'Berman deducts the value of the Cadillac he gave Duberstein as a business expense. What is the tax result for Duberstein under Duberstein and §274(b)?', opts:['Excluded — Berman felt genuine personal appreciation','Included — Berman\'s business deduction is strong evidence the transfer is not a gift','Excluded — corporations cannot make gifts but individuals can','Included — employer-to-employee transfers are never gifts under §102(c)'], correct:1, exp:'Under Duberstein, a gift must proceed from "detached and disinterested generosity." §274(b): donor who takes a business deduction over $25 cannot have the transfer qualify as a gift. A donor cannot deduct as a business expense AND have the recipient exclude as a gift. Result: included in Duberstein\'s gross income as compensation.'},
+  {topic:'Gifts & Bequests', q:'A (basis $1,000) gifts appreciated stock to B when FMV = $5,000. B later sells for $8,000. What is B\'s gain?', opts:['$3,000 — only post-gift appreciation','$7,000 — entire appreciation from A\'s original basis','$5,000 — FMV at time of gift is B\'s basis','$0 — gifts are excluded from income'], correct:1, exp:'Under §1015, B takes A\'s carryover basis of $1,000. Gain = Amount Realized ($8,000) − Adjusted Basis ($1,000) = $7,000. Taft v. Bowers: constitutionally permissible. B is taxed on entire appreciation — pre-gift ($4,000) and post-gift ($3,000).'},
+  {topic:'Gifts & Bequests', q:'A decedent owns property with basis $50,000 and FMV $200,000 at death. Her heir receives the property and later sells for $210,000. What is the heir\'s gain?', opts:['$160,000 — full appreciation since original purchase','$10,000 — appreciation above FMV at death','$0 — bequests are excluded','$200,000 — full sale price'], correct:1, exp:'Under §1014, heir takes a basis equal to FMV at date of decedent\'s death ($200,000). Pre-death appreciation ($150,000) permanently disappears — not just deferred, but forgiven ("stepped up"). Gain = $210,000 − $200,000 = $10,000.'},
+  {topic:'Discharge of Indebtedness', q:'Davis Polk guarantees your bank loan from Citibank and repays Citibank the full $5,000 you borrowed. Do you have COD income?', opts:['Yes — $5,000 COD income under §61(a)(12)','No — the debt was repaid in full; but you have $5,000 of compensation income','No — employer payments on your behalf are excluded under §102(c)','Yes — but excluded under §108(a) insolvency exception'], correct:1, exp:'COD income only arises when the LENDER is not repaid in full. Citibank was repaid in full — no discharge of indebtedness. But you do have income: $5,000 of compensation income under Old Colony Trust (payment on your behalf to a third party is income to you). NOT §102(c) — that excludes gifts; this is compensation, not a gift.'},
+  {topic:'Discharge of Indebtedness', q:'You buy a fridge from Walmart for $500 on credit. The fridge is defective and Walmart agrees to accept $400 in full satisfaction. Under §108(e)(5), what are the tax consequences?', opts:['$100 COD income — debt was reduced','No COD income — treated as purchase price reduction; basis reduced to $400','$100 COD income — excluded under §108(b) insolvency exception','No income — you are a solvent consumer'], correct:1, exp:'§108(e)(5): When a solvent purchaser\'s debt to the seller is reduced, it is treated as a purchase price reduction, NOT COD income → reduced basis instead. Requirements: purchaser/debtor is solvent; debt is to the seller; debt arose out of purchase of the property; would otherwise be CODI. Reason for adjustment doesn\'t matter. Basis reduced from $500 to $400.'},
+  {topic:'Realization', q:'Cottage Savings exchanges a pool of mortgage interests for another S&L\'s pool. The pools are economically equivalent but secured by different homes and owed by different obligors. Is there a realization event?', opts:['No — the pools are economically equivalent; no material difference','Yes — the interests embody legally distinct entitlements; material difference exists','No — there must be an economic difference for realization under §1001','Yes — any exchange of property is always a realization event'], correct:1, exp:'Cottage Savings: Exchange of property is a realization event if properties are "materially different," meaning they embody legally distinct entitlements. The mortgage interests are secured by different homes and owed by different obligors — legally distinct. Economic equivalence is irrelevant under the Cottage Savings test. Yes, realization occurred.'},
+  {topic:'Realization', q:'§7701(o) provides that a transaction has economic substance only if it satisfies two requirements. What are they, and is the test conjunctive or disjunctive?', opts:['(A) profit motive OR (B) business purpose — disjunctive','(A) meaningful non-tax change in economic position AND (B) substantial non-tax purpose — conjunctive','(A) arm\'s-length transaction AND (B) disclosed to IRS — conjunctive','(A) economic difference AND (B) legal difference — disjunctive'], correct:1, exp:'§7701(o)(1): (A) the transaction changes in a meaningful way (apart from Federal income tax effects) the taxpayer\'s economic position, AND (B) the taxpayer has a substantial purpose (apart from Federal income tax effects) for entering into such transaction. The test is CONJUNCTIVE — both must be satisfied. Cottage Savings flunks both. Penalty for violation: 40% under §6662(i). Only applies when doctrine is "relevant" — undefined, virtually no litigation.'},
+  {topic:'Assignment of Income', q:'A surgeon assigns 20% of her future surgical fees to a family trust for her children. The hospital pays the trust directly. Under Lucas v. Earl, who is taxed on the 20%?', opts:['The trust — it received the income directly','The children — ultimate beneficiaries','The surgeon — income from services taxed to the earner regardless of assignment','Split equally between surgeon and children'], correct:2, exp:'Lucas v. Earl: income from services is taxed to the person who earns it. The surgeon earned the fees through her personal services. No matter how she directs payment, the income is taxable to her. The assignment to the trust does not shift the tax obligation. "The fruit cannot be attributed to a different tree from which it grew."'},
+  {topic:'Capital Gains', q:'Elena buys distressed homes, renovates them, and sells them within 6 months. She has sold 20 homes this year. She claims capital gains treatment. Is she entitled?', opts:['Yes — real estate is always a capital asset under §1221','No — §1221(a)(1) excludes property held primarily for sale to customers in the ordinary course of business','Yes — she holds each property for some period before selling','No — only applies to property held more than 12 months'], correct:1, exp:'§1221(a)(1): property held primarily for sale to customers in the ordinary course of a trade or business is excluded from the definition of "capital asset." Elena\'s pattern — volume (20 homes/year), quick turnaround (6 months), active renovation — makes her a dealer, not an investor. Courts look at frequency, continuity, and purpose. Ordinary income, not capital gains.'},
+  {topic:'Capital Gains', q:'Arkansas Best purchased bank stock to protect its business reputation. The stock became worthless. The loss is:', opts:['Ordinary — purchased for a business purpose, which controls character','Capital — the stock is a capital asset; motive for purchase does not change character under §1221','Ordinary — deductible under §162 as a trade or business expense','Capital — but excluded under the business hedging exception'], correct:1, exp:'Arkansas Best: §1221 defines capital assets by what the property IS, not why it was purchased. The motive test is not incorporated into §1221. Stock is a capital asset under §1221 (it\'s not dealer property, not depreciable business property, etc.). The business motive for purchasing the stock does not transform a capital asset into an ordinary one. Capital loss.'},
+];
+
+// ── WORD PROBLEMS ──────────────────────────────────────────────────────────────
+const WP = [
+  {topic:'In-Kind Benefits', q:'Alex manages the Rustic Inn, a motel along Interstate 95. The Inn consists of 80 motel rooms and an adjoining house where Alex and his spouse and young children live. The phone line and doorbell to the motel ring in the house so that he can answer calls and welcome guests at all hours. Most other motels of the same size have full-time managers who are required to live on the premises. However, those managers are not usually given accommodations as nice as the house in which Alex and his family live. The motel deducts all expenses of the house.', sub:'Does Alex have any federal income tax obligations with respect to the lodging? Apply §119 and Benaglia.', modelAnswer:'§119 applies — lodging excluded. (1) Furnished to employee and spouse/dependents — YES. (2) For convenience of employer — YES; Alex must answer calls and welcome guests at all hours, on-call 24/7. (3) On business premises — YES; house is adjoining the motel property. (4) As condition of employment — ARGUABLY YES; most other motels require on-premises managers. The relative quality of accommodations is irrelevant to §119 analysis. Under Benaglia: same result — for convenience of employer. If house a mile down the road: §119 fails — on business premises requirement fails. Benaglia also likely fails.'},
+  {topic:'Gifts & Bequests', q:'Duberstein was president of a company who regularly provided business leads to Berman. Berman sent Duberstein a Cadillac to thank him. Duberstein had no need for it (already had two cars). Berman deducted the value as a business expense. Duberstein did not include it in gross income.', sub:'Is the Cadillac a gift to Duberstein excludable under §102(a)? Apply §102(c), §274(b), and Duberstein.', modelAnswer:'NOT a gift — included in gross income under §61(a)(1). Step 1: §102(c) — not employer-employee here. Does not apply. Step 2: §274(b) — Berman took a business deduction. A donor cannot deduct as a business expense AND have the recipient exclude as a gift. Deduction over $25 = not a gift. Step 3: Even applying Duberstein: gift must proceed from "detached and disinterested generosity." Here — transfer followed past business leads; ongoing commercial relationship; Berman had future interest in Duberstein providing more leads; business deduction taken. Tax Court: "recompense for past services and inducement for future services" = not clearly erroneous. NOT a gift.'},
+  {topic:'Discharge of Indebtedness', q:'A corporation issues bonds at $100 par. The next day, the Federal Reserve raises rates by 4 percentage points. The bond price in the secondary market drops to approximately $96. The corporation buys back its own bonds in the secondary market at $96.', sub:'What are the tax consequences of the buyback? Is there COD income?', modelAnswer:'Yes — $4 of COD income per bond. The corporation issued bonds for $100 and extinguished the debt obligation for $96 — the debt was discharged for less than its face amount. Under §61(a)(12) and Kirby Lumber: the difference between the issue price ($100) and the repurchase price ($96) = $4 of discharge of indebtedness income. COD income does not require default — it arises from voluntary economic repricing of debt. Rule: when interest rates go up, bond values go down; buybacks at discount produce COD income.'},
+  {topic:'Realization', q:'Cottage Savings Association held a portfolio of residential mortgage loans with a built-in loss (FMV declined below adjusted basis due to rising interest rates). To take advantage of the tax losses without triggering a regulatory event, Cottage Savings exchanged its mortgage interests for another S&L\'s interests in a different group of residential mortgage loans. The exchanged interests were economically equivalent but secured by different homes and owed by different obligors.', sub:'(1) Is there a realization event under §1001? (2) If so, can Cottage Savings deduct the losses under §165(a)?', modelAnswer:'(1) Yes, realization. §1001(a): gain/loss realized on "sale or other disposition" of property. Treas. Reg. §1.1001-1 requires exchange of property "differing materially either in kind or in extent." Cottage Savings: "materially different" = legally distinct entitlements. The mortgage interests are secured by different homes and owed by different obligors → legally distinct entitlements → realization event. IRS argument (economic equivalence = not materially different) rejected. (2) Yes, deductible under §165(a). Unlike Higgins, this was an arm\'s-length transaction with a third party — the loss was actually sustained, a bona fide transaction. The Court of Appeals had conflated §1001 realization with §165(a) loss-sustainment — they are separate inquiries.'},
+  {topic:'Assignment of Income', q:'Frank, a surgeon, earns $500,000 annually. He assigns 20% of his future surgical fees to a family trust for his children\'s benefit. The hospital pays the trust directly.', sub:'Who is taxed on the surgical income? Apply Lucas v. Earl.', modelAnswer:'Frank is taxed on 100% of his surgical fees. Under Lucas v. Earl, income from services is taxed to the person who earns it — the "tree" cannot be separated from its "fruit." Frank\'s surgical fees arise from his personal services. No matter how he directs payment, all $500,000 is taxable to Frank. The assignment to the trust does not shift the tax obligation. Distinguish Blair: Blair transferred the underlying property right (beneficial interest in trust) — he gave away the tree itself. Frank retained the tree (his surgical practice and skills) and only assigned the right to receive the fruit (the income). Lucas governs.'},
+];
+
+// ── FLASHCARDS ─────────────────────────────────────────────────────────────────
+const FLASHCARDS = [
+  {topic:'General Income', q:'What is the Haig-Simons definition of income and why does it matter?', a:'Income = Consumption + Change in Net Worth (I = C + ΔS). Not what the Code follows exactly, but the theoretical benchmark against which all tax preferences and exceptions are measured. If you exclude savings from tax, you end up with a tax on consumption only.'},
+  {topic:'General Income', q:'State the Glenshaw Glass definition of income and distinguish from Macomber.', a:'"Accessions to wealth, clearly realized, and over which the taxpayers have complete dominion." This is the broad, modern definition governing §61. Broader than Eisner v. Macomber\'s "gain derived from capital" — Glenshaw Glass includes windfalls not the product of capital or labor.'},
+  {topic:'General Income', q:'Under Old Colony Trust, if your employer pays your tax liability directly to the IRS, what is the result?', a:'Income to you. Payment of an employee\'s obligation by the employer constitutes additional gross income under §61(a)(1) as compensation. If someone satisfies your obligation, that payment is income to you. Economic benefit controls over form.'},
+  {topic:'In-Kind Benefits', q:'State the three requirements for meal exclusion under §119(a) and the additional requirement for lodging.', a:'Meals: (1) furnished to employee or spouse/dependents; (2) for the convenience of the employer; (3) on business premises of employer. Lodging: all three PLUS (4) employee must be required to accept lodging as a condition of employment.'},
+  {topic:'In-Kind Benefits', q:'Under §119(b)(1), what is the effect of an employment contract or state statute stating meals are "for convenience of employer"?', a:'NOT determinative. §119(b)(1) expressly provides that provisions of an employment contract or state statute fixing terms of employment shall not be determinative of whether the meals or lodging are intended as compensation. Prevents gaming by contract language.'},
+  {topic:'In-Kind Benefits', q:'When is cash NEVER a de minimis fringe under §132(e)?', a:'Always. Cash and cash equivalents (gift cards) are NEVER de minimis, regardless of amount. De minimis requires value so small that accounting for it would be unreasonable or administratively impracticable. Cash is always accountable.'},
+  {topic:'Gifts & Bequests', q:'State the Duberstein test for whether a transfer is a gift.', a:'A gift proceeds from "detached and disinterested generosity" out of "affection, respect, admiration, charity or like impulses." Critical inquiry: INTENT OF THE DONOR (transferor), not transferee. Trier of fact decides. Appellate review: "clearly erroneous" — highly deferential.'},
+  {topic:'Gifts & Bequests', q:'What does §102(c) provide and why does it matter for exam analysis?', a:'§102(c): any amount transferred by or for an employer to, or for the benefit of, an employee shall NOT be excluded from gross income as a gift. CATEGORICAL rule — no intent inquiry. Check this FIRST before applying Duberstein.'},
+  {topic:'Gifts & Bequests', q:'State the §1015 basis rule for gifted property and the exception for depreciated property.', a:'General rule: Donee takes donor\'s adjusted basis (carryover basis). Taxed on ALL appreciation — pre-gift + post-gift — upon sale. Exception: If FMV at time of gift < donor\'s basis → for determining LOSS ONLY, basis = FMV at time of gift. Amount in between = no gain and no loss. Pre-gift depreciation is erased.'},
+  {topic:'Gifts & Bequests', q:'What is the §1014 rule for bequests and how does it differ from §1015?', a:'§1014: Basis = FMV at date of decedent\'s death. Pre-death appreciation permanently FORGIVEN — not just deferred. The "step-up in basis." Contrast §1015 (carryover basis for gifts): pre-gift appreciation is merely deferred until donee sells. §1014 enables "buy, borrow, die" strategy.'},
+  {topic:'Discharge of Indebtedness', q:'When does COD income arise? What is the key distinction regarding who the lender is?', a:'COD income under §61(a)(12) arises when a debtor\'s debt is forgiven or discharged. KEY: COD income ONLY arises when the LENDER is NOT repaid in full. If a third party pays the debt in full, the lender is whole → NO COD income. Instead, the taxpayer has compensation or gift income.'},
+  {topic:'Discharge of Indebtedness', q:'State the §108(e)(5) purchase money debt reduction rule and its requirements.', a:'§108(e)(5): When a solvent purchaser\'s debt to the seller is reduced, it is treated as a purchase price reduction (reduced basis), NOT COD income. Requirements: (1) purchaser/debtor is solvent; (2) debt is to the seller; (3) debt arose out of purchase of property; (4) would otherwise be CODI. Reason for reduction doesn\'t matter. Applies only to PROPERTY, not services.'},
+  {topic:'Realization', q:'Is the realization requirement a constitutional requirement? Cite authority.', a:'NO. After Helvering v. Bruun (1940), realization is a matter of Congressional discretion, not constitutional. Bruun held that severance from capital is not necessary for realization. Eisner v. Macomber (1920) had suggested otherwise — Bruun effectively dismissed that reasoning without explicitly overruling Macomber.'},
+  {topic:'Realization', q:'State the Cottage Savings "legally distinct entitlements" test and give an example of where it does and does not apply.', a:'Cottage Savings: Exchange of property is a realization event if properties embody "legally distinct entitlements." Economic equivalence is IRRELEVANT. Does NOT apply: two shares of same IBM stock = legally identical = no realization. DOES apply: mortgage interests secured by different homes, owed by different obligors = legally distinct = realization.'},
+  {topic:'Realization', q:'What is the "worst of all worlds for the government" created by Cottage Savings + Rev. Rul. 90-109 + §1.1001-3 preamble?', a:'Taxpayer chooses: (1) Want to realize LOSSES → use Cottage Savings (modify legal entitlements — hair-trigger). (2) Want to AVOID realizing gains → rely on 90-109 and preamble (argue change not in fundamental substance). Government cannot win either argument — it issued the preamble and cannot prevail against SCOTUS on Cottage Savings.'},
+  {topic:'Assignment of Income', q:'State the Lucas v. Earl rule and the fruit-and-tree metaphor.', a:'Lucas v. Earl: Income from services is taxed to the person who earns it, regardless of any assignment or direction of payment to another. "The fruits cannot be attributed to a different tree from which they grew." You cannot contract away tax liability on income you earn.'},
+  {topic:'Assignment of Income', q:'How does Blair v. Commissioner differ from Lucas v. Earl?', a:'Blair: Taxpayer transferred the underlying property right itself (beneficial interest in a trust) to his children. Income naturally flowed to the owners of the property interest — the children. CONTRAST with Lucas: Blair gave away the "tree" itself. Lucas v. Earl: only assigned the "fruit" (future income from property/services retained). If you retain the tree and assign only the fruit → taxed to you. If you transfer the tree → income follows.'},
+  {topic:'Capital Gains', q:'What does §1221(a)(1) exclude from the definition of "capital asset" and why does it matter?', a:'§1221(a)(1): property held primarily for sale to customers in the ordinary course of business is NOT a capital asset → ordinary income. This is the dealer vs. investor distinction. Dealers (real estate, securities) get ordinary treatment. Investors get preferential capital gains rates. Courts look at frequency, continuity, volume, business purpose.'},
+  {topic:'Capital Gains', q:'What is the Arkansas Best rule and why does business motive not convert a capital asset to ordinary property?', a:'Arkansas Best (SCOTUS 1988): §1221 defines capital assets by what the property IS, not why it was acquired. The motive test is not incorporated into §1221. Stock is a capital asset under §1221 regardless of whether it was purchased for a business purpose. Business motive does not transform a capital asset into an ordinary one.'},
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const state = {
+  fc: { topic:'All', idx:0, filtered:[] },
+  mc: { topic:'All', idx:0, filtered:[], score:0, total:0, topicScores:{} },
+  wp: { topic:'All', idx:0, filtered:[] },
+  timed: { remaining:5400, interval:null, answered:{}, idx:0, filtered:[] },
+  soc: { history:[], topic:'In-Kind Benefits' },
+  perf: { fcseen:0, wpsub:0 }
+};
+
+// ── SIDEBAR ───────────────────────────────────────────────────────────────────
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+// ── NAV ───────────────────────────────────────────────────────────────────────
+function go(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+  const emojis = { dashboard:'🏠', outline:'📚', mc:'✅', wordproblems:'✏️', flashcards:'🃏', timed:'⏱️', socratic:'🎓', performance:'📈' };
+  const titles = { dashboard:'Dashboard', outline:'Course Outline', mc:'Multiple Choice', wordproblems:'Word Problems', flashcards:'Flashcards', timed:'Timed Exam', socratic:'Socratic Mode', performance:'Performance' };
+  document.getElementById('topbar-title').textContent = (titles[id]||id) + ' ' + (emojis[id]||'');
+  closeSidebar();
+  if (id === 'performance') updatePerf();
+}
+
+// ── COUNTDOWN ─────────────────────────────────────────────────────────────────
+function updateCountdown() {
+  const examDate = new Date('2026-05-10T09:00:00');
+  const now = new Date();
+  const diff = examDate - now;
+  if (diff < 0) {
+    document.getElementById('cdval').textContent = 'Exam day! 🎉';
+    if (document.getElementById('cd-dash')) document.getElementById('cd-dash').textContent = 'Today!';
+    return;
+  }
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const str = d + 'd ' + h + 'h';
+  document.getElementById('cdval').textContent = str;
+  if (document.getElementById('cd-dash')) document.getElementById('cd-dash').textContent = str;
+}
+updateCountdown();
+setInterval(updateCountdown, 60000);
+
+// ── OUTLINE ───────────────────────────────────────────────────────────────────
+function buildOutline() {
+  const el = document.getElementById('outline-content');
+  el.innerHTML = '';
+  OUTLINE.forEach((bucket, bi) => {
+    const col = BUCKET_COLORS[bucket.bucket] || { bg:'#f5f5f5', border:'#ddd', text:'#333', emoji:'📌' };
+    const bb = document.createElement('div');
+    bb.className = 'big-bucket';
+    const subtopicsHtml = bucket.subtopics.map((sub, si) => {
+      const tabKeys = ['rules','notes','statutes','cases','practice'];
+      const tabLabels = ['✅ Rules','📝 Notes','⚖️ Statutes','📋 Cases','💪 Practice'];
+      const tabsHtml = tabKeys.map((k, ti) =>
+        `<button class="part-tab${ti===0?' active':''}" onclick="switchTab(this,${bi},${si},${ti})">${tabLabels[ti]}</button>`
+      ).join('');
+      const panesHtml = tabKeys.map((k, ti) =>
+        `<div class="part-pane${ti===0?' active':''}" id="pp-${bi}-${si}-${ti}">${sub.tabs[k]||''}</div>`
+      ).join('');
+      return `<div class="sub-topic">
+        <button class="sub-header" id="sh-${bi}-${si}" onclick="toggleSub(${bi},${si})">
+          <span>${sub.title}</span>
+          <span class="sub-arrow" id="sa-${bi}-${si}">▶</span>
+        </button>
+        <div class="sub-body" id="sb-${bi}-${si}">
+          <div class="part-tabs" id="pt-${bi}-${si}">${tabsHtml}</div>
+          ${panesHtml}
+        </div>
+      </div>`;
+    }).join('');
+    bb.innerHTML = `
+      <button class="bucket-header" id="bh-${bi}" onclick="toggleBucket(${bi})" style="background:${col.bg};color:${col.text};">
+        <span>${col.emoji} ${bucket.bucket}</span>
+        <span class="bucket-arrow" id="ba-${bi}" style="color:${col.text};">▶</span>
+      </button>
+      <div class="bucket-body" id="bb-body-${bi}">${subtopicsHtml}</div>`;
+    el.appendChild(bb);
+  });
+}
+
+function toggleBucket(bi) {
+  const body = document.getElementById('bb-body-' + bi);
+  const hdr = document.getElementById('bh-' + bi);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  hdr.classList.toggle('open', !isOpen);
+}
+
+function toggleSub(bi, si) {
+  const body = document.getElementById('sb-' + bi + '-' + si);
+  const hdr = document.getElementById('sh-' + bi + '-' + si);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  hdr.classList.toggle('open', !isOpen);
+}
+
+function switchTab(btn, bi, si, ti) {
+  const tabsContainer = document.getElementById('pt-' + bi + '-' + si);
+  tabsContainer.querySelectorAll('.part-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const tabKeys = ['rules','notes','statutes','cases','practice'];
+  tabKeys.forEach((_, idx) => {
+    const pane = document.getElementById('pp-' + bi + '-' + si + '-' + idx);
+    if (pane) pane.classList.toggle('active', idx === ti);
+  });
+}
+
+function toggleAns(btn) {
+  const ans = btn.nextElementSibling;
+  const isShown = ans.classList.contains('show');
+  ans.classList.toggle('show', !isShown);
+  btn.textContent = isShown ? 'Show answer ▾' : 'Hide answer ▴';
+}
+
+buildOutline();
+
+// ── CHIPS ─────────────────────────────────────────────────────────────────────
+function buildChips(id, current, topics, onChange) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = '';
+  ['All', ...topics].forEach(t => {
+    const c = document.createElement('button');
+    c.className = 'chip' + (t === current ? ' active' : '');
+    c.textContent = t;
+    c.onclick = () => { buildChips(id, t, topics, onChange); onChange(t); };
+    el.appendChild(c);
+  });
+}
+const ALL_TOPICS = [...new Set([...MC.map(q=>q.topic), ...WP.map(p=>p.topic), ...FLASHCARDS.map(f=>f.topic)])];
+
+// ── FLASHCARDS ────────────────────────────────────────────────────────────────
+function filterFC(topic) {
+  state.fc.topic = topic;
+  state.fc.filtered = topic === 'All' ? [...FLASHCARDS] : FLASHCARDS.filter(f => f.topic === topic);
+  state.fc.idx = 0;
+  renderFC();
+}
+function renderFC() {
+  const cards = state.fc.filtered;
+  if (!cards.length) return;
+  const c = cards[state.fc.idx];
+  document.getElementById('fc').classList.remove('flipped');
+  setTimeout(() => {
+    document.getElementById('fc-topic-tag').textContent = c.topic;
+    document.getElementById('fc-q').textContent = c.q;
+    document.getElementById('fc-a').textContent = c.a;
+    document.getElementById('fc-ctr').textContent = (state.fc.idx + 1) + ' / ' + cards.length;
+    document.getElementById('fc-prev').disabled = state.fc.idx === 0;
+    document.getElementById('fc-next').disabled = state.fc.idx === cards.length - 1;
+  }, 50);
+  state.perf.fcseen++;
+}
+function flipCard() { document.getElementById('fc').classList.toggle('flipped'); }
+function fcNav(dir) {
+  const len = state.fc.filtered.length;
+  state.fc.idx = Math.max(0, Math.min(len - 1, state.fc.idx + dir));
+  document.getElementById('fc').classList.remove('flipped');
+  setTimeout(renderFC, 50);
+}
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('sec-flashcards').classList.contains('active')) return;
+  if (e.key === 'ArrowLeft') fcNav(-1);
+  if (e.key === 'ArrowRight') fcNav(1);
+  if (e.key === ' ') { e.preventDefault(); flipCard(); }
+});
+buildChips('fc-chips', 'All', ALL_TOPICS, filterFC);
+filterFC('All');
+
+// ── MC ────────────────────────────────────────────────────────────────────────
+let mcAnswered = false;
+function filterMC(topic) {
+  state.mc.topic = topic;
+  state.mc.filtered = topic === 'All' ? [...MC] : MC.filter(q => q.topic === topic);
+  state.mc.idx = 0;
+  mcAnswered = false;
+  renderMC();
+}
+function renderMC() {
+  const qs = state.mc.filtered;
+  if (!qs.length) return;
+  const q = qs[state.mc.idx];
+  mcAnswered = false;
+  document.getElementById('mc-meta').textContent = 'Question ' + (state.mc.idx + 1) + ' of ' + qs.length;
+  document.getElementById('mc-q').textContent = q.q;
+  document.getElementById('mc-next').disabled = true;
+  document.getElementById('mc-feedback').className = 'feedback';
+  const opts = document.getElementById('mc-opts');
+  opts.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const b = document.createElement('button');
+    b.className = 'mc-opt';
+    b.textContent = String.fromCharCode(65 + i) + '. ' + opt;
+    b.onclick = () => answerMC(i, q);
+    opts.appendChild(b);
+  });
+  updateMCScore();
+}
+function answerMC(chosen, q) {
+  if (mcAnswered) return;
+  mcAnswered = true;
+  document.querySelectorAll('#mc-opts .mc-opt').forEach((b, i) => {
+    b.disabled = true;
+    if (i === q.correct) b.classList.add('correct');
+    else if (i === chosen && chosen !== q.correct) b.classList.add('incorrect');
+  });
+  const correct = chosen === q.correct;
+  if (correct) state.mc.score++;
+  state.mc.total++;
+  const topic = state.mc.filtered[state.mc.idx].topic;
+  if (!state.mc.topicScores[topic]) state.mc.topicScores[topic] = { c:0, t:0 };
+  if (correct) state.mc.topicScores[topic].c++;
+  state.mc.topicScores[topic].t++;
+  const fb = document.getElementById('mc-feedback');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'bad');
+  fb.textContent = (correct ? '✓ Correct! ' : '✗ Incorrect. ') + q.exp;
+  document.getElementById('mc-next').disabled = false;
+  updateMCScore();
+}
+function nextMC() {
+  const len = state.mc.filtered.length;
+  if (state.mc.idx < len - 1) { state.mc.idx++; renderMC(); }
+  else {
+    const fb = document.getElementById('mc-feedback');
+    fb.className = 'feedback show ok';
+    fb.textContent = '🎉 Section complete! Score: ' + state.mc.score + '/' + state.mc.total + '.';
+  }
+}
+function updateMCScore() {
+  const el = document.getElementById('mc-score-display');
+  if (el) el.textContent = 'Score: ' + state.mc.score + '/' + state.mc.total;
+}
+buildChips('mc-chips', 'All', ALL_TOPICS, filterMC);
+filterMC('All');
+
+// ── WORD PROBLEMS ─────────────────────────────────────────────────────────────
+function filterWP(topic) {
+  state.wp.topic = topic;
+  state.wp.filtered = topic === 'All' ? [...WP] : WP.filter(p => p.topic === topic);
+  state.wp.idx = 0;
+  renderWP();
+}
+function renderWP() {
+  const ps = state.wp.filtered;
+  if (!ps.length) return;
+  const p = ps[state.wp.idx];
+  document.getElementById('wp-meta').textContent = 'Problem ' + (state.wp.idx + 1) + ' of ' + ps.length;
+  document.getElementById('wp-q').textContent = p.q;
+  document.getElementById('wp-sub').textContent = p.sub;
+  document.getElementById('wp-ta').value = '';
+  document.getElementById('wp-ai').className = 'ai-box';
+  document.getElementById('wp-next').style.display = 'none';
+  document.getElementById('wp-submit').style.display = 'inline-block';
+}
+async function submitWP() {
+  const answer = document.getElementById('wp-ta').value.trim();
+  if (!answer) { alert('Write your answer first! ✏️'); return; }
+  const p = state.wp.filtered[state.wp.idx];
+  document.getElementById('wp-loading').style.display = 'flex';
+  document.getElementById('wp-submit').disabled = true;
+  state.perf.wpsub++;
+  const prompt = `You are Professor Alex Raskolnikov of Columbia Law School, the top Federal Income Tax professor in the country. You are grading a 1L student's answer to a word problem. The student is aiming to be in the top 10 of the class — she is an A student.
+
+PROBLEM: ${p.q}
+QUESTION: ${p.sub}
+MODEL ANSWER (for your reference only — do not share verbatim): ${p.modelAnswer}
+STUDENT'S ANSWER: ${answer}
+
+Grade on a scale of 0–10. Evaluate:
+1. Did the student identify and cite the correct IRC sections?
+2. Did the student apply the correct legal test/framework (step-by-step)?
+3. Is the analysis correct and nuanced enough for an A student?
+4. Did the student address both sides where relevant?
+5. Is the answer in the expected format (concise, one sentence per issue, cite the code)?
+
+Respond EXACTLY in this format:
+SCORE: [X/10]
+FEEDBACK: [3–5 sentences of rigorous, Socratic feedback. Point out what they got right, what they missed, what code sections or cases they failed to apply, and where reasoning went wrong. Be direct and demanding — the standard is an A student at Columbia Law.]`;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, messages:[{role:'user',content:prompt}] })
+    });
+    const data = await res.json();
+    const text = data.content.map(b => b.text||'').join('');
+    const scoreMatch = text.match(/SCORE:\s*(\d+)\/10/i);
+    const feedbackMatch = text.match(/FEEDBACK:\s*([\s\S]+)/i);
+    const score = scoreMatch ? parseInt(scoreMatch[1]) : 5;
+    const feedback = feedbackMatch ? feedbackMatch[1].trim() : text;
+    const bc = score >= 8 ? 'score-hi' : score >= 5 ? 'score-mid' : 'score-lo';
+    document.getElementById('wp-score').innerHTML = `<span class="score-badge ${bc}">${score}/10</span>`;
+    document.getElementById('wp-body').textContent = feedback;
+    document.getElementById('wp-ai').className = 'ai-box show';
+    document.getElementById('wp-next').style.display = 'inline-block';
+  } catch(e) {
+    document.getElementById('wp-body').textContent = 'Could not connect to grader. Check your internet connection.';
+    document.getElementById('wp-ai').className = 'ai-box show';
+  }
+  document.getElementById('wp-loading').style.display = 'none';
+  document.getElementById('wp-submit').disabled = false;
+}
+function nextWP() {
+  const len = state.wp.filtered.length;
+  if (state.wp.idx < len - 1) { state.wp.idx++; renderWP(); }
+}
+buildChips('wp-chips', 'All', ALL_TOPICS, filterWP);
+filterWP('All');
+
+// ── TIMED EXAM ────────────────────────────────────────────────────────────────
+function startTimed() {
+  state.timed.remaining = 5400;
+  state.timed.answered = {};
+  state.timed.idx = 0;
+  state.timed.filtered = [...MC].sort(() => Math.random() - .5).slice(0, Math.min(15, MC.length));
+  document.getElementById('timed-start').style.display = 'none';
+  document.getElementById('timed-exam').style.display = 'block';
+  buildQGrid();
+  renderTimedQ();
+  clearInterval(window._timedInterval);
+  window._timedInterval = setInterval(tickTimer, 1000);
+}
+function tickTimer() {
+  state.timed.remaining--;
+  const r = state.timed.remaining;
+  const h = Math.floor(r/3600), m = Math.floor((r%3600)/60), s = r%60;
+  const display = h + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  const el = document.getElementById('exam-timer');
+  el.textContent = display;
+  el.className = 'timer' + (r<300?' crit':r<900?' warn':'');
+  if (r <= 0) endTimed();
+}
+function buildQGrid() {
+  const grid = document.getElementById('q-grid');
+  grid.innerHTML = '';
+  state.timed.filtered.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'q-dot' + (i===0?' curr':'');
+    d.textContent = i+1;
+    d.id = 'qdot-'+i;
+    d.onclick = () => goTimedQ(i);
+    grid.appendChild(d);
+  });
+}
+function goTimedQ(i) { state.timed.idx = i; renderTimedQ(); }
+function renderTimedQ() {
+  const qs = state.timed.filtered, i = state.timed.idx, q = qs[i];
+  document.getElementById('timed-meta').textContent = 'Question ' + (i+1) + ' of 15' + (i>=11?' ⭐ Weighted':'');
+  document.getElementById('timed-q').textContent = q.q;
+  document.getElementById('timed-next').disabled = true;
+  document.getElementById('timed-feedback').className = 'feedback';
+  document.querySelectorAll('.q-dot').forEach((d, j) => {
+    d.className = 'q-dot' + (state.timed.answered[j]!==undefined?' done':'') + (j===i?' curr':'');
+  });
+  const opts = document.getElementById('timed-opts');
+  opts.innerHTML = '';
+  const already = state.timed.answered[i];
+  q.opts.forEach((opt, j) => {
+    const b = document.createElement('button');
+    b.className = 'mc-opt';
+    b.textContent = String.fromCharCode(65+j) + '. ' + opt;
+    if (already !== undefined) {
+      b.disabled = true;
+      if (j === q.correct) b.classList.add('correct');
+      else if (j === already) b.classList.add('incorrect');
+    } else {
+      b.onclick = () => answerTimed(j, q, i);
+    }
+    opts.appendChild(b);
+  });
+  if (already !== undefined) {
+    const fb = document.getElementById('timed-feedback');
+    fb.className = 'feedback show ' + (already===q.correct?'ok':'bad');
+    fb.textContent = (already===q.correct?'✓ ':'✗ ') + q.exp;
+    document.getElementById('timed-next').disabled = false;
+  }
+}
+function answerTimed(chosen, q, qi) {
+  if (state.timed.answered[qi] !== undefined) return;
+  state.timed.answered[qi] = chosen;
+  renderTimedQ();
+}
+function nextTimed() {
+  if (state.timed.idx < 14) { state.timed.idx++; renderTimedQ(); }
+  else endTimed();
+}
+function endTimed() {
+  clearInterval(window._timedInterval);
+  const total = Object.keys(state.timed.answered).length;
+  const correct = Object.entries(state.timed.answered).filter(([i,a]) => state.timed.filtered[i].correct===a).length;
+  document.getElementById('timed-exam').style.display = 'none';
+  document.getElementById('timed-results').style.display = 'block';
+  document.getElementById('final-score').textContent = correct + '/15';
+  document.getElementById('final-detail').textContent = 'You answered ' + total + ' of 15 questions. ' + Math.round(correct/15*100) + '% correct.';
+}
+function resetTimed() {
+  document.getElementById('timed-results').style.display = 'none';
+  document.getElementById('timed-start').style.display = 'block';
+}
+
+// ── SOCRATIC ──────────────────────────────────────────────────────────────────
+const SOC_OPENERS = {
+  'In-Kind Benefits': 'All right. Your client\'s employer provides free meals in the company cafeteria on the business premises. The cafeteria is open to all employees. Your client is not required to be on call during meals. Does §119 apply? Walk me through every element of the test.',
+  'Gifts & Bequests': 'Your client received a $10,000 check from his former employer upon retirement, accompanied by a letter saying it was a "token of personal appreciation and affection." The employer deducted it as a business expense. Is this a gift under §102? Don\'t give me the conclusion — walk through the framework.',
+  'Realization': 'Cottage Savings — tell me why the result came out the way it did and why I think it is a hugely problematic case. What did the Court get wrong, and what game does it create for taxpayers?',
+  'General Income': 'Someone finds $500 on the street, keeps it, and spends it. Is this gross income? Give me the precise analysis under §61 and Glenshaw Glass.',
+  'Discharge of Indebtedness': 'Your client borrowed $10,000 from Davis Polk as an advance. When she started work, the partner told her she didn\'t have to pay it back. Does she have COD income? And separately — what if Davis Polk had guaranteed a bank loan and repaid the bank directly? Walk me through both.',
+  'Assignment of Income': 'A surgeon assigns 20% of her future surgical fees to a family trust for her children. The hospital pays the trust directly. Who is taxed on the income? Now tell me — how would the analysis change if she had instead transferred ownership of her medical practice to the trust?',
+  'Capital Gains': 'Elena buys distressed homes, renovates them, and sells them within 6 months — 20 homes this year. She says real estate is a capital asset under §1221. Is she right? What is the relevant inquiry?',
+};
+function buildSocChips() {
+  buildChips('soc-chips', state.soc.topic, Object.keys(SOC_OPENERS), t => { state.soc.topic = t; newSocratic(); });
+}
+async function newSocratic() {
+  state.soc.history = [];
+  document.getElementById('chat-msgs').innerHTML = '';
+  const opener = SOC_OPENERS[state.soc.topic] || 'All right. Tell me — what is the Haig-Simons definition of income and why doesn\'t the Code follow it exactly?';
+  appendMsg('prof', opener);
+  state.soc.history.push({ role:'assistant', content:opener });
+}
+function appendMsg(who, text) {
+  const msgs = document.getElementById('chat-msgs');
+  const d = document.createElement('div');
+  d.className = 'chat-msg ' + (who==='prof'?'msg-prof':'msg-you');
+  d.textContent = text;
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function chatKey(e) { if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); } }
+async function sendChat() {
+  const input = document.getElementById('chat-in');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  appendMsg('you', text);
+  state.soc.history.push({ role:'user', content:text });
+  document.getElementById('chat-loading').style.display = 'flex';
+  document.getElementById('chat-send').disabled = true;
+  const sys = `You are Professor Alex Raskolnikov, the foremost Federal Income Tax professor in the country, teaching at Columbia Law School Spring 2026. You are conducting a Socratic dialogue with a 1L student who is aiming to be in the top 10 of her class — she is an A student. Your style: intellectually rigorous, direct, demanding, uses precise hypotheticals, constantly asks "why?" and "what's the statutory basis?", cites IRC sections by number (§61, §102, §119, §132, §108, §1001, §1015, §7701(o), §1221, etc.), references specific cases by name (Old Colony Trust, Glenshaw Glass, Benaglia, Kowalski, Duberstein, Stanton, Taft v. Bowers, Kirby Lumber, Eisner v. Macomber, Bruun, Woodsam, Cottage Savings, Lucas v. Earl, Blair, Arkansas Best). You do NOT give away answers easily. You push back, introduce complications, and challenge weak or imprecise analysis. If the student gets something right, push them further. If wrong, point it out directly. Keep responses to 2–4 sentences maximum. Current topic: ${state.soc.topic}. Standard: top 10 students at Columbia Law. Do not simplify or paraphrase the law. Do not add pleasantries.`;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, system:sys, messages:state.soc.history })
+    });
+    const data = await res.json();
+    const reply = data.content.map(b => b.text||'').join('').trim();
+    appendMsg('prof', reply);
+    state.soc.history.push({ role:'assistant', content:reply });
+  } catch(e) { appendMsg('prof', 'Technical issue. Try again.'); }
+  document.getElementById('chat-loading').style.display = 'none';
+  document.getElementById('chat-send').disabled = false;
+}
+buildSocChips();
+newSocratic();
+
+// ── PERFORMANCE ───────────────────────────────────────────────────────────────
+function updatePerf() {
+  const mc = state.mc;
+  const pct = mc.total > 0 ? Math.round(mc.score/mc.total*100) : null;
+  document.getElementById('perf-mc-pct').textContent = pct !== null ? pct + '%' : '—';
+  document.getElementById('perf-mc-sub').textContent = mc.score + ' of ' + mc.total;
+  document.getElementById('perf-fc').textContent = state.perf.fcseen;
+  document.getElementById('perf-wp').textContent = state.perf.wpsub;
+  const bars = document.getElementById('perf-bars');
+  const topics = Object.keys(mc.topicScores);
+  if (!topics.length) {
+    bars.innerHTML = '<p style="color:var(--muted);font-size:13.5px;">Answer some MC questions to see your breakdown here! ✨</p>';
+    return;
+  }
+  bars.innerHTML = topics.map(t => {
+    const tv = mc.topicScores[t];
+    const p = Math.round(tv.c/tv.t*100);
+    const col = p >= 80 ? 'var(--sage-dark)' : p >= 60 ? 'var(--gold-dark)' : '#dc2626';
+    return `<div class="pb-row">
+      <div class="pb-lbl"><span>${t}</span><span style="font-family:var(--mono);color:var(--muted)">${tv.c}/${tv.t} (${p}%)</span></div>
+      <div class="pb-track"><div class="pb-fill" style="width:${p}%;background:${col}"></div></div>
+    </div>`;
+  }).join('');
+}
+</script>
+</body>
+</html>
